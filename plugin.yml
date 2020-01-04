@@ -1,0 +1,10 @@
+name: NPC
+author: alvin0319
+main: NPC\NPCPlugin
+version: 1.0.0
+api: 4.0.0
+
+commands:
+  npc:
+    description: NPC command.
+    permission: op
