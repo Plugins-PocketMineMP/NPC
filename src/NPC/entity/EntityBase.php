@@ -6,6 +6,7 @@ use pocketmine\entity\EntityFactory;
 use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\network\mcpe\protocol\MoveActorAbsolutePacket;
@@ -14,6 +15,7 @@ use pocketmine\network\mcpe\protocol\SetActorDataPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
+use pocketmine\network\mcpe\protocol\types\entity\FloatMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\entity\MetadataProperty;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -68,6 +70,10 @@ abstract class EntityBase{
 	public function initEntity(CompoundTag $nbt) : void{
 		if($nbt->hasTag("name", StringTag::class)){
 			$this->name = $nbt->getString("name");
+		}
+
+		if($nbt->hasTag("scale", FloatTag::class)){
+			$this->scale = $nbt->getFloat("scale");
 		}
 
 		$this->command = $nbt->getString("command", "");
@@ -241,6 +247,7 @@ abstract class EntityBase{
 		$nbt->setString("message", $this->message);
 		$nbt->setString("command", $this->command);
 		$nbt->setString("pos", implode(":", [$this->location->x, $this->location->y, $this->location->z, $this->location->world->getFolderName()]));
+		$nbt->setFloat("scale", $this->scale);
 		return $nbt;
 	}
 
@@ -260,6 +267,8 @@ abstract class EntityBase{
 
 		$player->getNetworkSession()->sendDataPacket($pk);
 		$this->hasSpawned[] = $player;
+
+		$this->sendData($player, [EntityMetadataProperties::SCALE => new FloatMetadataProperty($this->scale)]);
 	}
 
 	public function despawnTo(Player $player) : void{
@@ -278,5 +287,9 @@ abstract class EntityBase{
 	 */
 	public function getViewers() : array{
 		return $this->hasSpawned;
+	}
+
+	public function setScale(float $scale){
+		$this->scale = $scale;
 	}
 }

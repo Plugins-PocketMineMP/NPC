@@ -6,6 +6,8 @@ use NPC\config\EntityConfig;
 use pocketmine\entity\Location;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
+use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
+use pocketmine\network\mcpe\protocol\types\entity\FloatMetadataProperty;
 use pocketmine\player\Player;
 use pocketmine\Server;
 
@@ -54,6 +56,8 @@ class CustomEntity extends EntityBase{
 
 		$player->getNetworkSession()->sendDataPacket($pk);
 		$this->hasSpawned[] = $player;
+
+		$this->sendData($player, [EntityMetadataProperties::SCALE => new FloatMetadataProperty($this->scale)]);
 	}
 
 	public static function nbtDeserialize(CompoundTag $nbt){
