@@ -2,15 +2,12 @@
 declare(strict_types=1);
 namespace NPC\entity;
 
-use NPC\inventory\HumanInventory;
 use NPC\NPCPlugin;
 use pocketmine\entity\Location;
 use pocketmine\entity\Skin;
-use pocketmine\inventory\InventoryHolder;
-use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
@@ -23,7 +20,7 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\UUID;
 
-class NPCHuman extends EntityBase implements InventoryHolder{
+class NPCHuman extends EntityBase{
 
 	public const NETWORK_ID = 0;
 
@@ -38,9 +35,6 @@ class NPCHuman extends EntityBase implements InventoryHolder{
 
 	/** @var Skin */
 	protected $skin;
-
-	/** @var HumanInventory */
-	protected $inventory;
 
 	public function initEntity(CompoundTag $nbt) : void{
 		parent::initEntity($nbt);
@@ -63,10 +57,6 @@ class NPCHuman extends EntityBase implements InventoryHolder{
 		$this->isCustomSkin = $nbt->getByte("isCustomSkin", 0) === 1 ? true : false;
 	}
 
-	public function getInventory() : HumanInventory{
-		return $this->inventory;
-	}
-
 	public function getName() : string{
 		return (new \ReflectionClass($this))->getShortName();
 	}
@@ -85,7 +75,7 @@ class NPCHuman extends EntityBase implements InventoryHolder{
 		$pk->motion = null;
 		$pk->yaw = $this->location->yaw;
 		$pk->pitch = $this->location->pitch;
-		$pk->item = $this->inventory->getItemInHand();
+		$pk->item = ItemFactory::air();
 		$pk->metadata = $this->getSyncedNetworkData(false);
 		$player->getNetworkSession()->sendDataPacket($pk);
 

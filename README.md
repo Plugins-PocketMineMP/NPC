@@ -25,6 +25,7 @@ This plugin is designed for **[PocketMine-MP](https://github.com/pmmp/PocketMine
 >
 >Modeling can also be applied.
 
-If you want to apply modeling, you need to put geometryName: "your geometry name" in the json file created with BlockBench.
+If you want to apply modeling, you need to put geometryName: "your geometry name" in the json file created with BlockBench like this!
+
 
 And, to apply modeling, you need to have the gd extension installed in your php binary.

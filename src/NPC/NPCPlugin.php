@@ -2,12 +2,10 @@
 declare(strict_types=1);
 namespace NPC;
 
-use NPC\entity\ChickenEntity;
+use NPC\config\EntityConfig;
+use NPC\entity\CustomEntity;
 use NPC\entity\EntityBase;
-use NPC\entity\HorseEntity;
 use NPC\entity\NPCHuman;
-use NPC\entity\PigEntity;
-use NPC\entity\SheepEntity;
 use NPC\lang\PluginLang;
 use NPC\task\NPCCheckTask;
 use NPC\util\ExtensionNotLoadedException;
@@ -34,11 +32,7 @@ class NPCPlugin extends PluginBase{
 	protected $lang;
 
 	protected $entityNames = [
-		"pig" => PigEntity::class,
-		"horse" => HorseEntity::class,
-		"npc" => NPCHuman::class,
-		"chicken" => ChickenEntity::class,
-		"sheep" => SheepEntity::class
+		"npc" => NPCHuman::class
 	];
 
 	/** @var EntityBase[] */
@@ -75,20 +69,11 @@ class NPCPlugin extends PluginBase{
 		foreach($data->getListTag("npc")->getValue() as $tag){
 			if($tag instanceof CompoundTag){
 				switch($tag->getInt("type")){
-					case ChickenEntity::NETWORK_ID:
-						$class = ChickenEntity::nbtDeserialize($tag);
-						break;
-					case HorseEntity::NETWORK_ID:
-						$class = HorseEntity::nbtDeserialize($tag);
-						break;
 					case NPCHuman::NETWORK_ID:
 						$class = NPCHuman::nbtDeserialize($tag);
 						break;
-					case PigEntity::NETWORK_ID:
-						$class = PigEntity::nbtDeserialize($tag);
-						break;
-					case SheepEntity::NETWORK_ID:
-						$class = SheepEntity::nbtDeserialize($tag);
+					case CustomEntity::NETWORK_ID:
+						$class = CustomEntity::nbtDeserialize($tag);
 						break;
 					default:
 						throw new \InvalidStateException("Unknown entity type " . $tag->getInt("type"));
@@ -98,7 +83,7 @@ class NPCPlugin extends PluginBase{
 			}
 		}
 
-		$this->getScheduler()->scheduleRepeatingTask(new NPCCheckTask(), 1);
+		$this->getScheduler()->scheduleRepeatingTask(new NPCCheckTask(), 10);
 	}
 
 	public function onDisable(){
@@ -161,7 +146,6 @@ class NPCPlugin extends PluginBase{
 									/** @var NPCHuman $entity */
 									$entity = new NPCHuman($sender->getLocation(), $nbt);
 									$this->entities[self::pos2hash($sender->getLocation())] = $entity;
-									$entity->getInventory()->setItemInHand($sender->getInventory()->getItemInHand());
 
 									$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.spawn", [$entity->getRealName()]));
 								}
@@ -178,11 +162,11 @@ class NPCPlugin extends PluginBase{
 								$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.spawn", [$entity->getRealName()]));
 							}
 						}else{
-							if(in_array($args[1], array_keys($this->entityNames))){
+							if(in_array($args[1], array_keys(EntityConfig::NETWORK_IDS))){
 								$nbt = EntityFactory::createBaseNBT($sender->getPosition()->asVector3(), null, $sender->getLocation()->getYaw(), $sender->getLocation()->getPitch());
 								$nbt->setString("name", $args[2]);
 								/** @var EntityBase $entity */
-								$entity = new $this->entityNames[$args[1]]($sender->getLocation(), $nbt);
+								$entity = new CustomEntity(EntityConfig::NETWORK_IDS[$args[1]], $sender->getLocation(), $nbt);
 								$this->entities[self::pos2hash($sender->getLocation())] = $entity;
 								$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.spawn", [$entity->getRealName()]));
 							}else{
@@ -236,7 +220,7 @@ class NPCPlugin extends PluginBase{
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.delete.usage"));
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.edit.usage"));
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.get.usage"));
-				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.entity.list") . implode(", ", array_keys($this->entityNames)));
+				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.entity.list") . implode(", ", array_keys(EntityConfig::NETWORK_IDS)) . ", npc");
 		}
 		return true;
 	}
