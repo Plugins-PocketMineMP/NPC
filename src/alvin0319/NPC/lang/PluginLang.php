@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace NPC\lang;
+namespace alvin0319\NPC\lang;
 
-use NPC\NPCPlugin;
-use NPC\util\InvalidLanguageException;
+use alvin0319\NPC\NPCPlugin;
+use alvin0319\NPC\util\InvalidLanguageException;
 
 class PluginLang{
 

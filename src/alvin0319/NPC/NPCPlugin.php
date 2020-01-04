@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
-namespace NPC;
+namespace alvin0319\NPC;
 
-use NPC\config\EntityConfig;
-use NPC\entity\CustomEntity;
-use NPC\entity\EntityBase;
-use NPC\entity\NPCHuman;
-use NPC\lang\PluginLang;
-use NPC\task\NPCCheckTask;
-use NPC\util\ExtensionNotLoadedException;
-use NPC\util\FileNotFoundException;
+use alvin0319\NPC\config\EntityConfig;
+use alvin0319\NPC\entity\CustomEntity;
+use alvin0319\NPC\entity\EntityBase;
+use alvin0319\NPC\entity\NPCHuman;
+use alvin0319\NPC\lang\PluginLang;
+use alvin0319\NPC\task\NPCCheckTask;
+use alvin0319\NPC\util\ExtensionNotLoadedException;
+use alvin0319\NPC\util\FileNotFoundException;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\EntityFactory;

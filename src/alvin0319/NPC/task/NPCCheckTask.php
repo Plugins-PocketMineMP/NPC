@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace NPC\task;
+namespace alvin0319\NPC\task;
 
-use NPC\NPCPlugin;
+use alvin0319\NPC\NPCPlugin;
 use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace NPC;
+namespace alvin0319\NPC;
 
-use NPC\entity\EntityBase;
-use NPC\lang\PluginLang;
+use alvin0319\NPC\entity\EntityBase;
+use alvin0319\NPC\lang\PluginLang;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;

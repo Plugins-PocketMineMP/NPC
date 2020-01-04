@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace NPC\config;
-
-use pocketmine\network\mcpe\protocol\types\entity\EntityLegacyIds;
+namespace alvin0319\NPC\config;
 
 /**
  * Class EntityConfig

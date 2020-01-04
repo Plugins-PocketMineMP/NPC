@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace NPC\entity;
+namespace alvin0319\NPC\entity;
 
 use pocketmine\entity\EntityFactory;
 use pocketmine\entity\Location;

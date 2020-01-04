@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace NPC\entity;
+namespace alvin0319\NPC\entity;
 
-use NPC\NPCPlugin;
+use alvin0319\NPC\NPCPlugin;
 use pocketmine\entity\Location;
 use pocketmine\entity\Skin;
 use pocketmine\item\ItemFactory;
@@ -13,7 +13,6 @@ use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\network\mcpe\protocol\types\entity\FloatMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\entity\StringMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
@@ -86,7 +85,7 @@ class NPCHuman extends EntityBase{
 
 		$this->hasSpawned[] = $player;
 
-		$this->sendData($player, [EntityMetadataProperties::SCALE => new FloatMetadataProperty($this->scale)]);
+		$this->sendData($player, [EntityMetadataProperties::SCALE => $this->scale]);
 	}
 
 	public function despawnTo(Player $player) : void{

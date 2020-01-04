@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace NPC\util;
+namespace alvin0319\NPC\util;
 
 class ExtensionNotLoadedException extends \Exception{
 }
