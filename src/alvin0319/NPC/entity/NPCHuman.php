@@ -13,6 +13,7 @@ use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
+use pocketmine\network\mcpe\protocol\types\entity\FloatMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\entity\StringMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
@@ -85,7 +86,7 @@ class NPCHuman extends EntityBase{
 
 		$this->hasSpawned[] = $player;
 
-		$this->sendData($player, [EntityMetadataProperties::SCALE => $this->scale]);
+		$this->sendData($player, [EntityMetadataProperties::SCALE => new FloatMetadataProperty($this->scale)]);
 	}
 
 	public function despawnTo(Player $player) : void{
