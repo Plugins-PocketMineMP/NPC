@@ -4,7 +4,6 @@ namespace NPC\entity;
 
 use pocketmine\entity\EntityFactory;
 use pocketmine\entity\Location;
-use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\StringTag;
@@ -18,31 +17,43 @@ use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\network\mcpe\protocol\types\entity\MetadataProperty;
 use pocketmine\player\Player;
 use pocketmine\Server;
-use pocketmine\world\World;
 
 abstract class EntityBase{
 
 	public const NETWORK_ID = -1;
 
+	/** @var string */
 	protected $name;
 
+	/** @var string */
 	protected $command;
 
+	/** @var string */
 	protected $message;
 
+	/** @var Location */
 	protected $location;
 
+	/** @var int */
 	protected $id;
 
+	/** @var float */
 	protected $scale = 1.0;
 
+	/** @var Server */
 	protected $server;
 
+	/** @var Player[] */
 	protected $hasSpawned = [];
 
 	/** @var EntityMetadataCollection */
 	protected $networkProperties;
 
+	/**
+	 * EntityBase constructor.
+	 * @param Location $location
+	 * @param CompoundTag $nbt
+	 */
 	public function __construct(Location $location, CompoundTag $nbt){
 		$this->location = $location;
 		$this->initEntity($nbt);
@@ -51,6 +62,9 @@ abstract class EntityBase{
 		$this->server = Server::getInstance();
 	}
 
+	/**
+	 * @param CompoundTag $nbt
+	 */
 	public function initEntity(CompoundTag $nbt) : void{
 		if($nbt->hasTag("name", StringTag::class)){
 			$this->name = $nbt->getString("name");
@@ -64,6 +78,10 @@ abstract class EntityBase{
 		return $this->name;
 	}
 
+	/**
+	 * @param Vector3 $target
+	 * @see Living::lookAt()
+	 */
 	public function lookAt(Vector3 $target){
 		$horizontal = sqrt(($target->x - $this->location->x) ** 2 + ($target->z - $this->location->z) ** 2);
 		$vertical = $target->y - $this->location->y;
@@ -88,6 +106,9 @@ abstract class EntityBase{
 		}
 	}
 
+	/**
+	 * @return Player|null
+	 */
 	public function getClosestPlayer() : ?Player{
 		$arr = [];
 
@@ -105,30 +126,60 @@ abstract class EntityBase{
 		return null;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getMessage() : string{
 		return $this->message;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getCommand() : string{
 		return $this->command;
 	}
 
+	/**
+	 * @param string $message
+	 */
 	public function setMessage(string $message){
 		$this->message = $message;
 	}
 
+	/**
+	 * @param string $command
+	 */
 	public function setCommand(string $command){
 		$this->command = $command;
 	}
 
+	/**
+	 * @return Location
+	 */
 	public function getLocation() : Location{
 		return $this->location;
 	}
 
+	/**
+	 * @return int
+	 */
 	public function getId() : int{
 		return $this->id;
 	}
 
+	/**
+	 * @return Server
+	 */
+	public function getServer() : Server{
+		return $this->server;
+	}
+
+	/**
+	 * @param $player
+	 * @param array|null $data
+	 * @see Entity::sendData()
+	 */
 	public function sendData($player, ?array $data = null) : void{
 		if(!is_array($player)){
 			$player = [$player];
@@ -148,6 +199,9 @@ abstract class EntityBase{
 		}
 	}
 
+	/**
+	 * @see Entity::syncNetworkData()
+	 */
 	protected function syncNetworkData() : void{
 		$this->networkProperties->setByte(EntityMetadataProperties::ALWAYS_SHOW_NAMETAG,1);
 		$this->networkProperties->setFloat(EntityMetadataProperties::BOUNDING_BOX_HEIGHT, $this->height);

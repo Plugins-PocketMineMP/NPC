@@ -275,6 +275,10 @@ class NPCPlugin extends PluginBase{
 		return new Skin($player->getSkin()->getSkinId(), $bytes, "", $geometryName, $geometryData);
 	}
 
+	/**
+	 * @param Skin $skin
+	 * @return CompoundTag
+	 */
 	public function getSkinCompound(Skin $skin) : CompoundTag{
 		$nbt = CompoundTag::create();
 		$nbt->setString("Name", $skin->getSkinId());
@@ -286,10 +290,18 @@ class NPCPlugin extends PluginBase{
 		return $nbt;
 	}
 
+	/**
+	 * @param Location $pos
+	 * @return string
+	 */
 	public static function pos2hash(Location $pos) : string{
 		return implode(":", [$pos->x, $pos->y, $pos->z, $pos->world->getFolderName()]);
 	}
 
+	/**
+	 * @param int $id
+	 * @return EntityBase|null
+	 */
 	public function getEntityById(int $id) : ?EntityBase{
 		foreach(array_values($this->entities) as $entityBase){
 			if($entityBase->getId() === $id){
@@ -299,14 +311,23 @@ class NPCPlugin extends PluginBase{
 		return null;
 	}
 
+	/**
+	 * @return PluginLang
+	 */
 	public function getLanguage() : PluginLang{
 		return $this->lang;
 	}
 
+	/**
+	 * @param EntityBase $entityBase
+	 */
 	public function addEntity(EntityBase $entityBase){
 		$this->entities[self::pos2hash($entityBase->getLocation())] = $entityBase;
 	}
 
+	/**
+	 * @param EntityBase $entityBase
+	 */
 	public function removeEntity(EntityBase $entityBase){
 		unset($this->entities[self::pos2hash($entityBase->getLocation())]);
 	}

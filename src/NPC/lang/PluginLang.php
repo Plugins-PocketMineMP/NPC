@@ -7,14 +7,23 @@ use NPC\util\InvalidLanguageException;
 
 class PluginLang{
 
+	/** @var array */
 	protected $data;
 
+	/** @var string */
 	protected $lang;
 
+	/** @var NPCPlugin */
 	protected $plugin;
 
+	/** @var string */
 	public static $prefix;
 
+	/**
+	 * PluginLang constructor.
+	 * @param NPCPlugin $plugin
+	 * @throws InvalidLanguageException
+	 */
 	public function __construct(NPCPlugin $plugin){
 		$this->plugin = $plugin;
 
@@ -31,6 +40,11 @@ class PluginLang{
 		self::$prefix = $this->data["plugin.prefix"];
 	}
 
+	/**
+	 * @param string $str
+	 * @param array $params
+	 * @return string
+	 */
 	public function translateLanguage(string $str, array $params = []) : string{
 		$string = $this->data[$str];
 		foreach($params as $i => $param){
@@ -40,6 +54,10 @@ class PluginLang{
 		return $string;
 	}
 
+	/**
+	 * @param string $str
+	 * @return string
+	 */
 	public function getRealMessage(string $str) : string{
 		return $this->data[$str];
 	}

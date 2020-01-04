@@ -60,17 +60,6 @@ class NPCHuman extends EntityBase implements InventoryHolder{
 			$skinTag->getByteArray("GeometryData", "")
 		);
 
-		$this->inventory = new HumanInventory($this);
-
-		if($nbt->hasTag("Inventory", ListTag::class)){
-			$inventoryTag = $nbt->getListTag("Inventory");
-
-			foreach($inventoryTag->getValue() as $index => $itemData){
-				/** @var CompoundTag $itemData */
-				$item = Item::nbtDeserialize($itemData);
-				$this->inventory->setItem($index, $item);
-			}
-		}
 		$this->isCustomSkin = $nbt->getByte("isCustomSkin", 0) === 1 ? true : false;
 	}
 
@@ -124,18 +113,6 @@ class NPCHuman extends EntityBase implements InventoryHolder{
 		$nbt = parent::nbtSerialize();
 		$nbt->setInt("type", self::NETWORK_ID);
 
-		$inventoryTag = new ListTag();
-
-		for($i = 0; $i < $this->inventory->getSize(); $i++){
-			$item = $this->inventory->getItem($i);
-
-			if(!$item->isNull()){
-				$inventoryTag->push($item->nbtSerialize($i));
-			}
-		}
-
-		$nbt->setTag("Inventory", $inventoryTag);
-
 		$nbt->setString("command", $this->command);
 		$nbt->setString("message", $this->message);
 
@@ -144,10 +121,11 @@ class NPCHuman extends EntityBase implements InventoryHolder{
 		return $nbt;
 	}
 
+	/**
+	 * @param Vector3 $target
+	 * @see Living::lookAt()
+	 */
 	public function lookAt(Vector3 $target){
-		//if($this->isCustomSkin){
-		//	return;
-		//}
 		$horizontal = sqrt(($target->x - $this->location->x) ** 2 + ($target->z - $this->location->z) ** 2);
 		$vertical = $target->y - $this->location->y;
 		$this->location->pitch = -atan2($vertical, $horizontal) / M_PI * 180; //negative is up, positive is down
