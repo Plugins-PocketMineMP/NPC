@@ -117,7 +117,7 @@ class NPCHuman extends EntityBase{
 		$nbt->setString("command", $this->command);
 		$nbt->setString("message", $this->message);
 
-		$nbt->setTag("Skin", NPCPlugin::getInstance()->getSkinCompound($this->skin));
+		$nbt->setTag(NPCPlugin::getInstance()->getSkinCompound($this->skin));
 		$nbt->setByte("isCustomSkin", $this->isCustomSkin ? 1 : 0);
 		return $nbt;
 	}
