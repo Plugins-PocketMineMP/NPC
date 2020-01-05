@@ -4,6 +4,8 @@ The NPC plugin for [PocketMine-MP](https://github.com/pmmp/PocketMine-MP)
 
 This plugin is designed for **[PocketMine-MP](https://github.com/pmmp/PocketMine-MP)** and may not work with other **spoons or forks**.
 
+[![](https://poggit.pmmp.io/shield.state/NPC)](https://poggit.pmmp.io/p/NPC)
+
 ###### it's time to ditch Slapper
 
 |command|usage|
