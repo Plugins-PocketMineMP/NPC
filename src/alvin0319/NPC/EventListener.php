@@ -36,28 +36,34 @@ class EventListener implements Listener{
 				}
 
 				if(isset(Queue::$editQueue[$player->getName()])){
-					if(Queue::$editQueue[$player->getName()] ["mode"] === "command"){
-						$entity->setCommand(Queue::$editQueue[$player->getName()] ["target"]);
-					}elseif(Queue::$editQueue[$player->getName()] ["mode"] === "message"){
-						$entity->setMessage(Queue::$editQueue[$player->getName()] ["target"]);
-					}else{
-						if(is_numeric(Queue::$editQueue[$player->getName()] ["target"])){
-							$entity->setScale((float) Queue::$editQueue[$player->getName()]);
+					if($entity instanceof EntityBase){
+						if(Queue::$editQueue[$player->getName()] ["mode"] === "command"){
+							$entity->setCommand(Queue::$editQueue[$player->getName()] ["target"]);
+						}elseif(Queue::$editQueue[$player->getName()] ["mode"] === "message"){
+							$entity->setMessage(Queue::$editQueue[$player->getName()] ["target"]);
 						}else{
-							$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("command.onlyAccept", ["scale", "int"]));
+							if(is_numeric(Queue::$editQueue[$player->getName()] ["target"])){
+								$entity->setScale((float) Queue::$editQueue[$player->getName()]);
+							}else{
+								$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("command.onlyAccept", ["scale", "int"]));
+							}
 						}
+						$player->sendMessage(PluginLang::$prefix . "Edit success.");
+						unset(Queue::$editQueue[$player->getName()]);
+					}else{
+						$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("message.notExtend"));
 					}
-					$player->sendMessage(PluginLang::$prefix . "Edit success.");
-					unset(Queue::$editQueue[$player->getName()]);
 					return;
 				}
 
-				if(trim($entity->getMessage()) !== ""){
-					$player->sendMessage($entity->getMessage());
-				}
+				if($entity instanceof EntityBase){
+					if(trim($entity->getMessage()) !== ""){
+						$player->sendMessage($entity->getMessage());
+					}
 
-				if(trim($entity->getCommand()) !== ""){
-					$player->getServer()->dispatchCommand($player, $entity->getCommand());
+					if(trim($entity->getCommand()) !== ""){
+						$player->getServer()->dispatchCommand($player, $entity->getCommand());
+					}
 				}
 			}
 		}
