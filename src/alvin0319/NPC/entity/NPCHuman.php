@@ -1,23 +1,21 @@
 <?php
 declare(strict_types=1);
-namespace NPC\entity;
+namespace alvin0319\NPC\entity;
 
-use NPC\NPCPlugin;
-use pocketmine\entity\Location;
+use alvin0319\NPC\NPCPlugin;
+use pocketmine\entity\Entity;
 use pocketmine\entity\Skin;
 use pocketmine\item\ItemFactory;
+use pocketmine\level\Location;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\network\mcpe\protocol\types\entity\FloatMetadataProperty;
-use pocketmine\network\mcpe\protocol\types\entity\StringMetadataProperty;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
-use pocketmine\player\Player;
+use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\UUID;
 
@@ -66,7 +64,11 @@ class NPCHuman extends EntityBase{
 		if(in_array($player, $this->hasSpawned, true)){
 			return;
 		}
-		$player->getNetworkSession()->sendDataPacket(PlayerListPacket::add([PlayerListEntry::createAdditionEntry($this->uuid, $this->id, $this->getName(), SkinAdapterSingleton::get()->toSkinData($this->skin))]));
+
+		$pk = new PlayerListPacket();
+		$pk->entries = [PlayerListEntry::createAdditionEntry($this->uuid, $this->id, $this->getName(), SkinAdapterSingleton::get()->toSkinData($this->skin))];
+		$pk->type = PlayerListPacket::TYPE_ADD;
+		$player->sendDataPacket($pk);
 
 		$pk = new AddPlayerPacket();
 		$pk->uuid = $this->uuid;
@@ -76,28 +78,34 @@ class NPCHuman extends EntityBase{
 		$pk->motion = null;
 		$pk->yaw = $this->location->yaw;
 		$pk->pitch = $this->location->pitch;
-		$pk->item = ItemFactory::air();
+		$pk->item = ItemFactory::get(0);
 		$pk->metadata = $this->getSyncedNetworkData(false);
-		$player->getNetworkSession()->sendDataPacket($pk);
+		$player->sendDataPacket($pk);
 
-		$this->sendData($player, [EntityMetadataProperties::NAMETAG => new StringMetadataProperty($this->getRealName())]);
+		$this->sendData($player, [Entity::DATA_NAMETAG => [Entity::DATA_TYPE_STRING, $this->getRealName()]]);
 
-		$player->getNetworkSession()->sendDataPacket(PlayerListPacket::remove([PlayerListEntry::createRemovalEntry($this->uuid)]));
+		$pk = new PlayerListPacket();
+		$pk->entries = [PlayerListEntry::createRemovalEntry($this->uuid)];
+		$pk->type = PlayerListPacket::TYPE_REMOVE;
+		$player->sendDataPacket($pk);
 
 		$this->hasSpawned[] = $player;
 
-		$this->sendData($player, [EntityMetadataProperties::SCALE => new FloatMetadataProperty($this->scale)]);
+		$this->sendData($player, [Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, $this->scale]]);
 	}
 
 	public function despawnTo(Player $player) : void{
 		parent::despawnTo($player);
-		$player->getNetworkSession()->sendDataPacket(PlayerListPacket::remove([PlayerListEntry::createAdditionEntry($this->uuid, $this->id, $this->getName(), SkinAdapterSingleton::get()->toSkinData($this->skin))]));
+		$pk = new PlayerListPacket();
+		$pk->entries = [PlayerListEntry::createAdditionEntry($this->uuid, $this->id, $this->getName(), SkinAdapterSingleton::get()->toSkinData($this->skin))];
+		$pk->type = PlayerListPacket::TYPE_REMOVE;
+		$player->sendDataPacket($pk);
 	}
 
 	public static function nbtDeserialize(CompoundTag $nbt) : NPCHuman{
 		[$x, $y, $z, $world] = explode(":", $nbt->getString("pos"));
 		return new NPCHuman(
-			new Location((float) $x, (float) $y, (float) $z, 0.0, 0.0, Server::getInstance()->getWorldManager()->getWorldByName($world)),
+			new Location((float) $x, (float) $y, (float) $z, 0.0, 0.0, Server::getInstance()->getLevelByName($world)),
 			$nbt
 		);
 	}
@@ -138,7 +146,7 @@ class NPCHuman extends EntityBase{
 		$pk->headYaw = $this->location->yaw;
 
 		foreach($this->getViewers() as $player){
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->sendDataPacket($pk);
 		}
 	}
 }

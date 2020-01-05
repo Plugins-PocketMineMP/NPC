@@ -6,8 +6,6 @@ This plugin is designed for **[PocketMine-MP](https://github.com/pmmp/PocketMine
 
 ###### it's time to ditch Slapper
 
->Notice: This plugin is not complete!
-
 |command|usage|
 |------|---|
 |/npc create [type] [name] [skinPath(optional)] [geometryPath(optional)|Create an entity.

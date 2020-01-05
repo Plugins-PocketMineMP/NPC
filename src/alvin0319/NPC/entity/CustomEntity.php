@@ -1,14 +1,13 @@
 <?php
 declare(strict_types=1);
-namespace NPC\entity;
+namespace alvin0319\NPC\entity;
 
-use NPC\config\EntityConfig;
-use pocketmine\entity\Location;
+use alvin0319\NPC\config\EntityConfig;
+use pocketmine\entity\Entity;
+use pocketmine\level\Location;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\network\mcpe\protocol\types\entity\FloatMetadataProperty;
-use pocketmine\player\Player;
+use pocketmine\Player;
 use pocketmine\Server;
 
 class CustomEntity extends EntityBase{
@@ -54,17 +53,17 @@ class CustomEntity extends EntityBase{
 		$pk->pitch = $this->location->pitch;
 		$pk->metadata = $this->getSyncedNetworkData(false);
 
-		$player->getNetworkSession()->sendDataPacket($pk);
+		$player->sendDataPacket($pk);
 		$this->hasSpawned[] = $player;
 
-		$this->sendData($player, [EntityMetadataProperties::SCALE => new FloatMetadataProperty($this->scale)]);
+		$this->sendData($player, [Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, $this->scale]]);
 	}
 
 	public static function nbtDeserialize(CompoundTag $nbt){
 		[$x, $y, $z, $world] = explode(":", $nbt->getString("pos"));
 		return new CustomEntity(
 			$nbt->getInt("networkId"),
-			new Location((float) $x, (float) $y, (float) $z, 0.0, 0.0, Server::getInstance()->getWorldManager()->getWorldByName($world)),
+			new Location((float) $x, (float) $y, (float) $z, 0.0, 0.0, Server::getInstance()->getLevelByName($world)),
 			$nbt
 		);
 	}

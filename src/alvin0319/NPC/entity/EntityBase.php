@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
-namespace NPC\entity;
+namespace alvin0319\NPC\entity;
 
-use pocketmine\entity\EntityFactory;
-use pocketmine\entity\Location;
+use pocketmine\entity\DataPropertyManager;
+use pocketmine\entity\Entity;
+use pocketmine\level\Location;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\FloatTag;
@@ -12,12 +13,7 @@ use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\network\mcpe\protocol\MoveActorAbsolutePacket;
 use pocketmine\network\mcpe\protocol\RemoveActorPacket;
 use pocketmine\network\mcpe\protocol\SetActorDataPacket;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\network\mcpe\protocol\types\entity\FloatMetadataProperty;
-use pocketmine\network\mcpe\protocol\types\entity\MetadataProperty;
-use pocketmine\player\Player;
+use pocketmine\Player;
 use pocketmine\Server;
 
 abstract class EntityBase{
@@ -48,7 +44,7 @@ abstract class EntityBase{
 	/** @var Player[] */
 	protected $hasSpawned = [];
 
-	/** @var EntityMetadataCollection */
+	/** @var DataPropertyManager */
 	protected $networkProperties;
 
 	/**
@@ -59,8 +55,8 @@ abstract class EntityBase{
 	public function __construct(Location $location, CompoundTag $nbt){
 		$this->location = $location;
 		$this->initEntity($nbt);
-		$this->id = EntityFactory::nextRuntimeId();
-		$this->networkProperties = new EntityMetadataCollection();
+		$this->id = Entity::$entityCount++;
+		$this->networkProperties = new DataPropertyManager();
 		$this->server = Server::getInstance();
 	}
 
@@ -108,7 +104,7 @@ abstract class EntityBase{
 		$pk->entityRuntimeId = $this->id;
 
 		foreach($this->getViewers() as $player){
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->sendDataPacket($pk);
 		}
 	}
 
@@ -118,7 +114,7 @@ abstract class EntityBase{
 	public function getClosestPlayer() : ?Player{
 		$arr = [];
 
-		foreach($this->location->getWorld()->getPlayers() as $player){
+		foreach($this->location->getLevel()->getPlayers() as $player){
 			$arr[(int) floor($this->location->distance($player->getPosition()))] = $player;
 		}
 
@@ -191,17 +187,19 @@ abstract class EntityBase{
 			$player = [$player];
 		}
 
-		$pk = SetActorDataPacket::create($this->getId(), $data ?? $this->getSyncedNetworkData(false));
+		$pk = new SetActorDataPacket();
+		$pk->entityRuntimeId = $this->getId();
+		$pk->metadata = $data ?? $this->getSyncedNetworkData(false);
 
 		foreach($player as $p){
 			if($p === $this){
 				continue;
 			}
-			$p->getNetworkSession()->sendDataPacket(clone $pk);
+			$p->sendDataPacket(clone $pk);
 		}
 
 		if($this instanceof Player){
-			$this->getNetworkSession()->sendDataPacket($pk);
+			$this->sendDataPacket($pk);
 		}
 	}
 
@@ -209,29 +207,29 @@ abstract class EntityBase{
 	 * @see Entity::syncNetworkData()
 	 */
 	protected function syncNetworkData() : void{
-		$this->networkProperties->setByte(EntityMetadataProperties::ALWAYS_SHOW_NAMETAG,1);
-		$this->networkProperties->setFloat(EntityMetadataProperties::BOUNDING_BOX_HEIGHT, $this->height);
-		$this->networkProperties->setFloat(EntityMetadataProperties::BOUNDING_BOX_WIDTH, $this->width);
-		$this->networkProperties->setFloat(EntityMetadataProperties::SCALE, $this->scale);
-		$this->networkProperties->setLong(EntityMetadataProperties::LEAD_HOLDER_EID, -1);
-		$this->networkProperties->setLong(EntityMetadataProperties::OWNER_EID, $this->ownerId ?? -1);
-		$this->networkProperties->setLong(EntityMetadataProperties::TARGET_EID, $this->targetId ?? 0);
-		$this->networkProperties->setString(EntityMetadataProperties::NAMETAG, $this->name);
+		$this->networkProperties->setByte(Entity::DATA_ALWAYS_SHOW_NAMETAG,1);
+		$this->networkProperties->setFloat(Entity::DATA_BOUNDING_BOX_HEIGHT, $this->height);
+		$this->networkProperties->setFloat(Entity::DATA_BOUNDING_BOX_WIDTH, $this->width);
+		$this->networkProperties->setFloat(Entity::DATA_SCALE, $this->scale);
+		$this->networkProperties->setLong(Entity::DATA_LEAD_HOLDER_EID, -1);
+		$this->networkProperties->setLong(Entity::DATA_OWNER_EID, $this->ownerId ?? -1);
+		$this->networkProperties->setLong(Entity::DATA_TARGET_EID, $this->targetId ?? 0);
+		$this->networkProperties->setString(Entity::DATA_NAMETAG, $this->name);
 
-		$this->networkProperties->setGenericFlag(EntityMetadataFlags::AFFECTED_BY_GRAVITY, true);
-		$this->networkProperties->setGenericFlag(EntityMetadataFlags::CAN_SHOW_NAMETAG, true);
-		$this->networkProperties->setGenericFlag(EntityMetadataFlags::HAS_COLLISION, true);
-		$this->networkProperties->setGenericFlag(EntityMetadataFlags::IMMOBILE, false);
-		$this->networkProperties->setGenericFlag(EntityMetadataFlags::INVISIBLE, false);
-		$this->networkProperties->setGenericFlag(EntityMetadataFlags::ONFIRE, false);
-		$this->networkProperties->setGenericFlag(EntityMetadataFlags::SNEAKING, false);
-		$this->networkProperties->setGenericFlag(EntityMetadataFlags::WALLCLIMBING, false);
+		$this->setGenericFlag(Entity::DATA_FLAG_AFFECTED_BY_GRAVITY, true);
+		$this->setGenericFlag(Entity::DATA_FLAG_CAN_SHOW_NAMETAG, true);
+		$this->setGenericFlag(Entity::DATA_FLAG_HAS_COLLISION, true);
+		$this->setGenericFlag(Entity::DATA_FLAG_IMMOBILE, false);
+		$this->setGenericFlag(Entity::DATA_FLAG_INVISIBLE, false);
+		$this->setGenericFlag(Entity::DATA_FLAG_ONFIRE, false);
+		$this->setGenericFlag(Entity::DATA_FLAG_SNEAKING, false);
+		$this->setGenericFlag(Entity::DATA_FLAG_WALLCLIMBING, false);
 	}
 
 	/**
 	 * @param bool $dirtyOnly
 	 *
-	 * @return MetadataProperty[]
+	 * @return array
 	 */
 	final protected function getSyncedNetworkData(bool $dirtyOnly) : array{
 		$this->syncNetworkData();
@@ -242,11 +240,11 @@ abstract class EntityBase{
 	abstract public static function nbtDeserialize(CompoundTag $nbt);
 
 	public function nbtSerialize() : CompoundTag{
-		$nbt = CompoundTag::create();
+		$nbt = new CompoundTag();
 		$nbt->setString("name", $this->name);
 		$nbt->setString("message", $this->message);
 		$nbt->setString("command", $this->command);
-		$nbt->setString("pos", implode(":", [$this->location->x, $this->location->y, $this->location->z, $this->location->world->getFolderName()]));
+		$nbt->setString("pos", implode(":", [$this->location->x, $this->location->y, $this->location->z, $this->location->level->getFolderName()]));
 		$nbt->setFloat("scale", $this->scale);
 		return $nbt;
 	}
@@ -265,17 +263,21 @@ abstract class EntityBase{
 		$pk->pitch = $this->location->pitch;
 		$pk->metadata = $this->getSyncedNetworkData(false);
 
-		$player->getNetworkSession()->sendDataPacket($pk);
+		$player->sendDataPacket($pk);
 		$this->hasSpawned[] = $player;
 
-		$this->sendData($player, [EntityMetadataProperties::SCALE => new FloatMetadataProperty($this->scale)]);
+		$this->sendData($player, [Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, $this->scale]]);
 	}
 
 	public function despawnTo(Player $player) : void{
 		if(!in_array($player, $this->hasSpawned, true)){
 			return;
 		}
-		$player->getNetworkSession()->sendDataPacket(RemoveActorPacket::create($this->id));
+
+		$pk = new RemoveActorPacket();
+		$pk->entityUniqueId = $this->id;
+		$player->sendDataPacket($pk);
+
 		$key = array_search($player, $this->hasSpawned, true);
 		if($key !== false){
 			unset($this->hasSpawned[$key]);
@@ -291,5 +293,50 @@ abstract class EntityBase{
 
 	public function setScale(float $scale){
 		$this->scale = $scale;
+	}
+
+	/**
+	 * @param int  $propertyId
+	 * @param int  $flagId
+	 * @param bool $value
+	 * @param int  $propertyType
+	 */
+	public function setDataFlag(int $propertyId, int $flagId, bool $value = true, int $propertyType = Entity::DATA_TYPE_LONG) : void{
+		if($this->getDataFlag($propertyId, $flagId) !== $value){
+			$flags = (int) $this->networkProperties->getPropertyValue($propertyId, $propertyType);
+			$flags ^= 1 << $flagId;
+			$this->networkProperties->setPropertyValue($propertyId, $propertyType, $flags);
+		}
+	}
+
+	/**
+	 * @param int $propertyId
+	 * @param int $flagId
+	 *
+	 * @return bool
+	 */
+	public function getDataFlag(int $propertyId, int $flagId) : bool{
+		return (((int) $this->networkProperties->getPropertyValue($propertyId, -1)) & (1 << $flagId)) > 0;
+	}
+
+	/**
+	 * Wrapper around {@link Entity#getDataFlag} for generic data flag reading.
+	 *
+	 * @param int $flagId
+	 *
+	 * @return bool
+	 */
+	public function getGenericFlag(int $flagId) : bool{
+		return $this->getDataFlag($flagId >= 64 ? Entity::DATA_FLAGS2 : Entity::DATA_FLAGS, $flagId % 64);
+	}
+
+	/**
+	 * Wrapper around {@link Entity#setDataFlag} for generic data flag setting.
+	 *
+	 * @param int  $flagId
+	 * @param bool $value
+	 */
+	public function setGenericFlag(int $flagId, bool $value = true) : void{
+		$this->setDataFlag($flagId >= 64 ? Entity::DATA_FLAGS2 : Entity::DATA_FLAGS, $flagId % 64, $value, Entity::DATA_TYPE_LONG);
 	}
 }

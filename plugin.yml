@@ -1,8 +1,8 @@
 name: NPC
 author: alvin0319
-main: NPC\NPCPlugin
-version: 1.0.1
-api: 4.0.0
+main: alvin0319\NPC\NPCPlugin
+version: 1.0.2
+api: 3.0.0
 
 commands:
   npc:

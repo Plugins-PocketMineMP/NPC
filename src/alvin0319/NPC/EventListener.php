@@ -1,24 +1,23 @@
 <?php
 declare(strict_types=1);
-namespace NPC;
+namespace alvin0319\NPC;
 
-use NPC\entity\EntityBase;
-use NPC\lang\PluginLang;
+use alvin0319\NPC\entity\EntityBase;
+use alvin0319\NPC\lang\PluginLang;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
-use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionData;
 
 class EventListener implements Listener{
 
 	public function handleReceivePacket(DataPacketReceiveEvent $event){
-		$player = $event->getOrigin()->getPlayer();
+		$player = $event->getPlayer();
 		$packet = $event->getPacket();
 
 		if($packet instanceof InventoryTransactionPacket){
-			if($packet->trData instanceof UseItemOnEntityTransactionData){
-				$entity = NPCPlugin::getInstance()->getEntityById($packet->trData->getEntityRuntimeId());
+			if($packet->transactionType === InventoryTransactionPacket::TYPE_USE_ITEM_ON_ENTITY){
+				$entity = NPCPlugin::getInstance()->getEntityById($packet->trData->entityRuntimeId);
 
 				if(isset(Queue::$removeQueue[$player->getName()])){
 					if($entity instanceof EntityBase){

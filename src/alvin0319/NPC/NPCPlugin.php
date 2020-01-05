@@ -1,25 +1,23 @@
 <?php
 declare(strict_types=1);
-namespace NPC;
+namespace alvin0319\NPC;
 
-use NPC\config\EntityConfig;
-use NPC\entity\CustomEntity;
-use NPC\entity\EntityBase;
-use NPC\entity\NPCHuman;
-use NPC\lang\PluginLang;
-use NPC\task\NPCCheckTask;
-use NPC\util\ExtensionNotLoadedException;
-use NPC\util\FileNotFoundException;
+use alvin0319\NPC\config\EntityConfig;
+use alvin0319\NPC\entity\CustomEntity;
+use alvin0319\NPC\entity\EntityBase;
+use alvin0319\NPC\entity\NPCHuman;
+use alvin0319\NPC\lang\PluginLang;
+use alvin0319\NPC\task\NPCCheckTask;
+use alvin0319\NPC\util\ExtensionNotLoadedException;
+use alvin0319\NPC\util\FileNotFoundException;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\entity\EntityFactory;
-use pocketmine\entity\Location;
 use pocketmine\entity\Skin;
-use pocketmine\nbt\LittleEndianNbtSerializer;
+use pocketmine\level\Location;
+use pocketmine\nbt\LittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
-use pocketmine\nbt\TreeRoot;
-use pocketmine\player\Player;
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 
 class NPCPlugin extends PluginBase{
@@ -61,10 +59,12 @@ class NPCPlugin extends PluginBase{
 		$this->data = $this->getConfig()->getAll();
 
 		if(!file_exists($file = $this->getDataFolder() . "npc.dat")){
-			file_put_contents($file, (new LittleEndianNbtSerializer())->writeCompressed(new TreeRoot(CompoundTag::create()->setTag("npc", new ListTag()))));
+			$nbt = new CompoundTag();
+			$nbt->setTag(new ListTag("npc"));
+			file_put_contents($file, (new LittleEndianNBTStream())->writeCompressed($nbt));
 		}
 
-		$data = (new LittleEndianNbtSerializer())->readCompressed(file_get_contents($file))->mustGetCompoundTag();
+		$data = (new LittleEndianNBTStream())->readCompressed(file_get_contents($file));
 
 		foreach($data->getListTag("npc")->getValue() as $tag){
 			if($tag instanceof CompoundTag){
@@ -87,14 +87,14 @@ class NPCPlugin extends PluginBase{
 	}
 
 	public function onDisable(){
-		$nbt = CompoundTag::create();
-		$tag = new ListTag();
+		$nbt = new CompoundTag();
+		$tag = new ListTag("npc");
 
 		foreach(array_values($this->entities) as $baseEntity){
 			$tag->push($baseEntity->nbtSerialize());
 		}
-		$nbt->setTag("npc", $tag);
-		file_put_contents($this->getDataFolder() . "npc.dat", (new LittleEndianNbtSerializer())->writeCompressed(new TreeRoot($nbt)));
+		$nbt->setTag($tag);
+		file_put_contents($this->getDataFolder() . "npc.dat", (new LittleEndianNBTStream())->writeCompressed($nbt));
 		$this->getLogger()->info($this->lang->translateLanguage("plugin.disabled"));
 	}
 
@@ -136,12 +136,12 @@ class NPCPlugin extends PluginBase{
 									$sender->sendMessage(PluginLang::$prefix . $e->getMessage());
 								}
 
-								$nbt = CompoundTag::create();
+								$nbt = new CompoundTag("Skin");
 
 								if($bool && isset($skin)){
 									$nbt->setString("name", $args[2]);
 									$nbt->setByte("isCustomSkin", 1);
-									$nbt->setTag("Skin", $this->getSkinCompound($skin));
+									$nbt->setTag($this->getSkinCompound($skin));
 
 									/** @var NPCHuman $entity */
 									$entity = new NPCHuman($sender->getLocation(), $nbt);
@@ -151,9 +151,9 @@ class NPCPlugin extends PluginBase{
 								}
 							}else{
 								$skin = $sender->getSkin();
-								$nbt = CompoundTag::create();
+								$nbt = new CompoundTag();
 								$nbt->setString("name", $args[2]);
-								$nbt->setTag("Skin", $this->getSkinCompound($skin));
+								$nbt->setTag($this->getSkinCompound($skin));
 
 								/** @var NPCHuman $entity */
 								$entity = new NPCHuman($sender->getLocation(), $nbt);
@@ -163,7 +163,7 @@ class NPCPlugin extends PluginBase{
 							}
 						}else{
 							if(in_array($args[1], array_keys(EntityConfig::NETWORK_IDS))){
-								$nbt = EntityFactory::createBaseNBT($sender->getPosition()->asVector3(), null, $sender->getLocation()->getYaw(), $sender->getLocation()->getPitch());
+								$nbt = new CompoundTag();
 								$nbt->setString("name", $args[2]);
 								/** @var EntityBase $entity */
 								$entity = new CustomEntity(EntityConfig::NETWORK_IDS[$args[1]], $sender->getLocation(), $nbt);
@@ -264,7 +264,7 @@ class NPCPlugin extends PluginBase{
 	 * @return CompoundTag
 	 */
 	public function getSkinCompound(Skin $skin) : CompoundTag{
-		$nbt = CompoundTag::create();
+		$nbt = new CompoundTag("Skin");
 		$nbt->setString("Name", $skin->getSkinId());
 		$nbt->setByteArray("Data", $skin->getSkinData());
 		$nbt->setByteArray("CapeData", $skin->getCapeData());
@@ -279,7 +279,7 @@ class NPCPlugin extends PluginBase{
 	 * @return string
 	 */
 	public static function pos2hash(Location $pos) : string{
-		return implode(":", [$pos->x, $pos->y, $pos->z, $pos->world->getFolderName()]);
+		return implode(":", [$pos->x, $pos->y, $pos->z, $pos->level->getFolderName()]);
 	}
 
 	/**
