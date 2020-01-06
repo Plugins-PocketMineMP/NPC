@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace alvin0319\NPC;
 
 use alvin0319\NPC\config\EntityConfig;
+use alvin0319\NPC\config\ImageConfig;
 use alvin0319\NPC\entity\CustomEntity;
 use alvin0319\NPC\entity\EntityBase;
 use alvin0319\NPC\entity\NPCHuman;
@@ -29,12 +30,11 @@ class NPCPlugin extends PluginBase{
 	/** @var PluginLang */
 	protected $lang;
 
-	protected $entityNames = [
-		"npc" => NPCHuman::class
-	];
-
 	/** @var EntityBase[] */
 	protected $entities = [];
+
+	/** @var ImageConfig */
+	protected $imageConfig;
 
 	public function onLoad(){
 		self::$instance = $this;
@@ -52,7 +52,6 @@ class NPCPlugin extends PluginBase{
 
 		$this->lang = new PluginLang($this);
 
-		$this->getLogger()->info($this->lang->translateLanguage("plugin.loaded"));
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
 
@@ -84,6 +83,10 @@ class NPCPlugin extends PluginBase{
 		}
 
 		$this->getScheduler()->scheduleRepeatingTask(new NPCCheckTask(), 10);
+
+		$this->imageConfig = new ImageConfig($this);
+
+		$this->getLogger()->info($this->lang->translateLanguage("plugin.loaded"));
 	}
 
 	public function onDisable(){
@@ -95,6 +98,9 @@ class NPCPlugin extends PluginBase{
 		}
 		$nbt->setTag($tag);
 		file_put_contents($this->getDataFolder() . "npc.dat", (new LittleEndianNBTStream())->writeCompressed($nbt));
+
+		$this->imageConfig->save();
+
 		$this->getLogger()->info($this->lang->translateLanguage("plugin.disabled"));
 	}
 
@@ -300,6 +306,13 @@ class NPCPlugin extends PluginBase{
 	 */
 	public function getLanguage() : PluginLang{
 		return $this->lang;
+	}
+
+	/**
+	 * @return ImageConfig
+	 */
+	public function getImageConfig() : ImageConfig{
+		return $this->imageConfig;
 	}
 
 	/**
