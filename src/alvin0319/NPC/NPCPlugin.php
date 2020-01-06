@@ -203,7 +203,7 @@ class NPCPlugin extends PluginBase{
 			case "edit":
 				if(isset($args[1])){
 					if(isset($args[2])){
-						if(in_array($args[1], ["command", "message"])){
+						if(in_array($args[1], ["command", "message", "scale"])){
 							Queue::$editQueue[$sender->getName()] = [
 								"mode" => $args[1],
 								"target" => $args[2]

@@ -9,6 +9,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\level\Location;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
@@ -54,6 +55,13 @@ class NPCHuman extends EntityBase{
 		);
 
 		$this->isCustomSkin = $nbt->getByte("isCustomSkin", 0) === 1 ? true : false;
+
+		if($nbt->hasTag("width", FloatTag::class) && $nbt->hasTag("height", FloatTag::class)){
+			$this->width = $nbt->getFloat("width");
+			$this->height = $nbt->getFloat("height");
+		}
+
+		$this->scale = $nbt->getFloat("scale", 1.0);
 	}
 
 	public function getName() : string{
@@ -90,8 +98,6 @@ class NPCHuman extends EntityBase{
 		$player->sendDataPacket($pk);
 
 		$this->hasSpawned[] = $player;
-
-		$this->sendData($player, [Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, $this->scale]]);
 	}
 
 	public function despawnTo(Player $player) : void{

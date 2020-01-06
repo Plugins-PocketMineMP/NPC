@@ -6,6 +6,7 @@ use alvin0319\NPC\config\EntityConfig;
 use pocketmine\entity\Entity;
 use pocketmine\level\Location;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\FloatTag;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 use pocketmine\Server;
@@ -33,6 +34,13 @@ class CustomEntity extends EntityBase{
 
 		$this->width = EntityConfig::WIDTHS[$this->id];
 		$this->height = EntityConfig::HEIGHTS[$this->id];
+
+		if($nbt->hasTag("width", FloatTag::class) && $nbt->hasTag("height", FloatTag::class)){
+			$this->width = $nbt->getFloat("width");
+			$this->height = $nbt->getFloat("height");
+		}
+
+		$this->scale = $nbt->getFloat("scale", 1.0);
 	}
 
 	public function getNetworkId() : int{
@@ -51,12 +59,10 @@ class CustomEntity extends EntityBase{
 		$pk->yaw = $this->location->yaw;
 		$pk->headYaw = $this->location->yaw;
 		$pk->pitch = $this->location->pitch;
-		$pk->metadata = $this->getSyncedNetworkData(false);
+		$pk->metadata = $data = $this->getSyncedNetworkData(false);
 
 		$player->sendDataPacket($pk);
 		$this->hasSpawned[] = $player;
-
-		$this->sendData($player, [Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, $this->scale]]);
 	}
 
 	public static function nbtDeserialize(CompoundTag $nbt){

@@ -197,10 +197,6 @@ abstract class EntityBase{
 			}
 			$p->sendDataPacket(clone $pk);
 		}
-
-		if($this instanceof Player){
-			$this->sendDataPacket($pk);
-		}
 	}
 
 	/**
@@ -212,8 +208,8 @@ abstract class EntityBase{
 		$this->networkProperties->setFloat(Entity::DATA_BOUNDING_BOX_WIDTH, $this->width);
 		$this->networkProperties->setFloat(Entity::DATA_SCALE, $this->scale);
 		$this->networkProperties->setLong(Entity::DATA_LEAD_HOLDER_EID, -1);
-		$this->networkProperties->setLong(Entity::DATA_OWNER_EID, $this->ownerId ?? -1);
-		$this->networkProperties->setLong(Entity::DATA_TARGET_EID, $this->targetId ?? 0);
+		$this->networkProperties->setLong(Entity::DATA_OWNER_EID, -1);
+		$this->networkProperties->setLong(Entity::DATA_TARGET_EID, 0);
 		$this->networkProperties->setString(Entity::DATA_NAMETAG, $this->name);
 
 		$this->setGenericFlag(Entity::DATA_FLAG_AFFECTED_BY_GRAVITY, true);
@@ -224,6 +220,7 @@ abstract class EntityBase{
 		$this->setGenericFlag(Entity::DATA_FLAG_ONFIRE, false);
 		$this->setGenericFlag(Entity::DATA_FLAG_SNEAKING, false);
 		$this->setGenericFlag(Entity::DATA_FLAG_WALLCLIMBING, false);
+		$this->setGenericFlag(Entity::DATA_FLAG_ALWAYS_SHOW_NAMETAG, true);
 	}
 
 	/**
@@ -246,6 +243,8 @@ abstract class EntityBase{
 		$nbt->setString("command", $this->command);
 		$nbt->setString("pos", implode(":", [$this->location->x, $this->location->y, $this->location->z, $this->location->level->getFolderName()]));
 		$nbt->setFloat("scale", $this->scale);
+		$nbt->setFloat("width", $this->width);
+		$nbt->setFloat("height", $this->height);
 		return $nbt;
 	}
 
@@ -261,12 +260,11 @@ abstract class EntityBase{
 		$pk->yaw = $this->location->yaw;
 		$pk->headYaw = $this->location->yaw;
 		$pk->pitch = $this->location->pitch;
-		$pk->metadata = $this->getSyncedNetworkData(false);
+		$pk->metadata = $data = $this->getSyncedNetworkData(false);
+		var_dump($data);
 
 		$player->sendDataPacket($pk);
 		$this->hasSpawned[] = $player;
-
-		$this->sendData($player, [Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, $this->scale]]);
 	}
 
 	public function despawnTo(Player $player) : void{
@@ -293,6 +291,11 @@ abstract class EntityBase{
 
 	public function setScale(float $scale){
 		$this->scale = $scale;
+
+		$multiplier = $scale / $this->scale;
+
+		$this->width *= $multiplier;
+		$this->height *= $multiplier;
 	}
 
 	/**

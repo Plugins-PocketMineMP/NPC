@@ -42,7 +42,7 @@ class EventListener implements Listener{
 							$entity->setMessage(Queue::$editQueue[$player->getName()] ["target"]);
 						}else{
 							if(is_numeric(Queue::$editQueue[$player->getName()] ["target"])){
-								$entity->setScale((float) Queue::$editQueue[$player->getName()]);
+								$entity->setScale((float) Queue::$editQueue[$player->getName()] ["target"]);
 							}else{
 								$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("command.onlyAccept", ["scale", "int"]));
 							}
