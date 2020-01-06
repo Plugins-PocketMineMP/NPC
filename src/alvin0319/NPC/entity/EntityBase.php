@@ -248,6 +248,8 @@ abstract class EntityBase{
 		$nbt->setString("command", $this->command);
 		$nbt->setString("pos", implode(":", [$this->location->x, $this->location->y, $this->location->z, $this->location->world->getFolderName()]));
 		$nbt->setFloat("scale", $this->scale);
+		$nbt->setFloat("width", $this->width);
+		$nbt->setFloat("height", $this->height);
 		return $nbt;
 	}
 
@@ -267,8 +269,6 @@ abstract class EntityBase{
 
 		$player->getNetworkSession()->sendDataPacket($pk);
 		$this->hasSpawned[] = $player;
-
-		$this->sendData($player, [EntityMetadataProperties::SCALE => new FloatMetadataProperty($this->scale)]);
 	}
 
 	public function despawnTo(Player $player) : void{
@@ -291,5 +291,10 @@ abstract class EntityBase{
 
 	public function setScale(float $scale){
 		$this->scale = $scale;
+
+		$multiplier = $scale / $this->scale;
+
+		$this->width *= $multiplier;
+		$this->height *= $multiplier;
 	}
 }
