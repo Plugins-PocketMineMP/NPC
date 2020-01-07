@@ -10,7 +10,7 @@ use pocketmine\utils\Internet;
 class CheckVersionAsyncTask extends AsyncTask{
 
 	public function onRun(){
-		$url = Internet::getURL("https://raw.githubusercontent.com/alvin0319/NPC/master/updates.json");
+		$url = Internet::getURL("https://raw.githubusercontent.com/alvin0319/NPC/stable/updates.json");
 
 		if(is_bool($url)){
 			$this->setResult(null);
@@ -19,8 +19,8 @@ class CheckVersionAsyncTask extends AsyncTask{
 
 			if($data !== null){
 				$lastVersion = $data["version"];
-				$lastMessage = $data[$lastVersion] ["message"];
-				$mustUpdate = $data[$lastVersion] ["mustUpdate"];
+				$lastMessage = $data["updates"] [$lastVersion] ["message"];
+				$mustUpdate = $data["updates"] [$lastVersion] ["mustUpdate"];
 
 				$this->setResult(["version" => $lastVersion, "message" => $lastMessage, "update" => $mustUpdate]);
 			}else{
@@ -55,6 +55,8 @@ class CheckVersionAsyncTask extends AsyncTask{
 						$plugin->getLogger()->emergency("You must update this plugin before you can use it.");
 						$server->getPluginManager()->disablePlugin($plugin);
 					}
+				}else{
+					$plugin->getLogger()->info("The latest version.");
 				}
 			}
 		}
