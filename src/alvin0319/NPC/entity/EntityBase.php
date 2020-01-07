@@ -109,26 +109,6 @@ abstract class EntityBase{
 	}
 
 	/**
-	 * @return Player|null
-	 */
-	public function getClosestPlayer() : ?Player{
-		$arr = [];
-
-		foreach($this->location->getLevel()->getPlayers() as $player){
-			$arr[(int) floor($this->location->distance($player->getPosition()))] = $player;
-		}
-
-		arsort($arr);
-
-		for($i = 0; $i <= 7; $i++){
-			if(isset($arr[$i])){
-				return $arr[$i];
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getMessage() : string{
@@ -260,8 +240,7 @@ abstract class EntityBase{
 		$pk->yaw = $this->location->yaw;
 		$pk->headYaw = $this->location->yaw;
 		$pk->pitch = $this->location->pitch;
-		$pk->metadata = $data = $this->getSyncedNetworkData(false);
-		var_dump($data);
+		$pk->metadata = $this->getSyncedNetworkData(false);
 
 		$player->sendDataPacket($pk);
 		$this->hasSpawned[] = $player;

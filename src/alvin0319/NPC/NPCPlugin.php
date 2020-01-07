@@ -8,7 +8,7 @@ use alvin0319\NPC\entity\CustomEntity;
 use alvin0319\NPC\entity\EntityBase;
 use alvin0319\NPC\entity\NPCHuman;
 use alvin0319\NPC\lang\PluginLang;
-use alvin0319\NPC\task\NPCCheckTask;
+use alvin0319\NPC\task\CheckVersionAsyncTask;
 use alvin0319\NPC\util\ExtensionNotLoadedException;
 use alvin0319\NPC\util\FileNotFoundException;
 use pocketmine\command\Command;
@@ -82,7 +82,7 @@ class NPCPlugin extends PluginBase{
 			}
 		}
 
-		$this->getScheduler()->scheduleRepeatingTask(new NPCCheckTask(), 10);
+		$this->getServer()->getAsyncPool()->submitTask(new CheckVersionAsyncTask());
 
 		$this->imageConfig = new ImageConfig($this);
 

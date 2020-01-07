@@ -5,6 +5,7 @@ namespace alvin0319\NPC;
 use alvin0319\NPC\entity\EntityBase;
 use alvin0319\NPC\lang\PluginLang;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
@@ -74,6 +75,22 @@ class EventListener implements Listener{
 		$player = $event->getPlayer();
 		foreach(NPCPlugin::getInstance()->getEntities() as $entityBase){
 			$entityBase->despawnTo($player);
+		}
+	}
+
+	public function handleMove(PlayerMoveEvent $event){
+		$player = $event->getPlayer();
+		foreach(NPCPlugin::getInstance()->getEntities() as $entityBase){
+			if($entityBase->getLocation()->getLevel()->getFolderName() === $player->getLevel()->getFolderName()){
+				if($entityBase->getLocation()->distance($player->getLocation()) <= (int) NPCPlugin::getInstance()->getConfig()->getNested("spawn-radius", 10)){
+					$entityBase->spawnTo($player);
+					$entityBase->lookAt($player);
+				}else{
+					$entityBase->despawnTo($player);
+				}
+			}else{
+				$entityBase->despawnTo($player);
+			}
 		}
 	}
 }
