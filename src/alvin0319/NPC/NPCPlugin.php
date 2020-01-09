@@ -142,6 +142,7 @@ class NPCPlugin extends PluginBase{
 				/** @var EntityBase $npc */
 				$npc = $class::nbtDeserialize($tag);
 				$this->pluginEntities[$npc->getId()] = $npc;
+				unset($this->tagData[$class]);
 			}
 		}
 	}

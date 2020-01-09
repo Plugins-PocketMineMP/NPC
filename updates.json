@@ -12,6 +12,10 @@
     "1.0.3": {
       "message": "add scale, and fix some bugs, and rewrite EntityBase code.",
       "mustUpdate": true
+    },
+    "1.0.4": {
+      "message": "Fixed an error message when not in remove mode, and added plugin dependencies.",
+      "mustUpdate": true
     }
   }
 }
