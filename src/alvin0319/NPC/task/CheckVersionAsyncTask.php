@@ -44,7 +44,7 @@ class CheckVersionAsyncTask extends AsyncTask{
 
 				$lastVer = $this->getResult()["version"];
 
-				if($ver !== $lastVer){
+				if(version_compare($lastVer, $ver) > 0){
 					$mustUpdate = $this->getResult()["update"];
 					$message = $this->getResult()["message"];
 
