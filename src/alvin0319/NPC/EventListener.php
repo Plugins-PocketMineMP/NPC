@@ -57,15 +57,7 @@ class EventListener implements Listener{
 				}
 
 				if($entity instanceof EntityBase){
-					if(trim($entity->getMessage()) !== ""){
-						$player->sendMessage($entity->getMessage());
-					}
-
-					if(trim($entity->getCommand()) !== ""){
-						$player->getServer()->dispatchCommand($player, $entity->getCommand());
-					}
-				}else{
-					$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("message.notExtend"));
+					$entity->interact($player);
 				}
 			}
 		}

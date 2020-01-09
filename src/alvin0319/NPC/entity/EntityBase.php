@@ -321,4 +321,14 @@ abstract class EntityBase{
 	public function setGenericFlag(int $flagId, bool $value = true) : void{
 		$this->setDataFlag($flagId >= 64 ? Entity::DATA_FLAGS2 : Entity::DATA_FLAGS, $flagId % 64, $value, Entity::DATA_TYPE_LONG);
 	}
+
+	public function interact(Player $player){
+		if(trim($this->getMessage()) !== ""){
+			$player->sendMessage($this->getMessage());
+		}
+
+		if(trim($this->getCommand()) !== ""){
+			$player->getServer()->dispatchCommand($player, $this->getCommand());
+		}
+	}
 }

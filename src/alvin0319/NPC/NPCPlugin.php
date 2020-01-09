@@ -33,6 +33,12 @@ class NPCPlugin extends PluginBase{
 	/** @var EntityBase[] */
 	protected $entities = [];
 
+	/** @var EntityBase[] */
+	protected $pluginEntities = [];
+
+	/** @var CompoundTag[] */
+	protected $tagData = [];
+
 	/** @var ImageConfig */
 	protected $imageConfig;
 
@@ -78,7 +84,21 @@ class NPCPlugin extends PluginBase{
 						throw new \InvalidStateException("Unknown entity type " . $tag->getInt("type"));
 				}
 
-				$this->entities[$tag->getString("pos")] = $class;
+				$this->entities[$class->getId()] = $class;
+			}
+		}
+
+		if(!file_exists($file = $this->getDataFolder() . "plugin_npc.dat")){
+			$nbt = new CompoundTag();
+			$nbt->setTag(new ListTag("npc"));
+			file_put_contents($file, (new LittleEndianNBTStream())->writeCompressed($nbt));
+		}
+
+		$data = (new LittleEndianNBTStream())->readCompressed(file_get_contents($this->getDataFolder() . "plugin_npc.dat"));
+
+		foreach($data->getListTag("npc")->getValue() as $tag){
+			if($tag instanceof CompoundTag){
+				$this->tagData[$tag->getString("pluginName", "none")] = $tag;
 			}
 		}
 
@@ -101,7 +121,29 @@ class NPCPlugin extends PluginBase{
 
 		$this->imageConfig->save();
 
+		$nbt = new CompoundTag();
+		$tag = new ListTag("npc");
+
+		foreach(array_values($this->pluginEntities) as $baseEntity){
+			$tag->push($baseEntity->nbtSerialize());
+		}
+		$nbt->setTag($tag);
+		file_put_contents($this->getDataFolder() . "plugin_npc.dat", (new LittleEndianNBTStream())->writeCompressed($nbt));
+
 		$this->getLogger()->info($this->lang->translateLanguage("plugin.disabled"));
+	}
+
+	/**
+	 * @param string|EntityBase $class
+	 */
+	public function registerClass(string $class){
+		foreach($this->tagData as $eclass => $tag){
+			if($eclass === $class){
+				/** @var EntityBase $npc */
+				$npc = $class::nbtDeserialize($tag);
+				$this->pluginEntities[$npc->getId()] = $npc;
+			}
+		}
 	}
 
 	public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
@@ -151,7 +193,7 @@ class NPCPlugin extends PluginBase{
 
 									/** @var NPCHuman $entity */
 									$entity = new NPCHuman($sender->getLocation(), $nbt);
-									$this->entities[self::pos2hash($sender->getLocation())] = $entity;
+									$this->entities[$entity->getId()] = $entity;
 
 									$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.spawn", [$entity->getRealName()]));
 								}
@@ -163,7 +205,7 @@ class NPCPlugin extends PluginBase{
 
 								/** @var NPCHuman $entity */
 								$entity = new NPCHuman($sender->getLocation(), $nbt);
-								$this->entities[self::pos2hash($sender->getLocation())] = $entity;
+								$this->entities[$entity->getId()] = $entity;
 
 								$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.spawn", [$entity->getRealName()]));
 							}
@@ -173,7 +215,7 @@ class NPCPlugin extends PluginBase{
 								$nbt->setString("name", $args[2]);
 								/** @var EntityBase $entity */
 								$entity = new CustomEntity(EntityConfig::NETWORK_IDS[$args[1]], $sender->getLocation(), $nbt);
-								$this->entities[self::pos2hash($sender->getLocation())] = $entity;
+								$this->entities[$entity->getId()] = $entity;
 								$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.spawn", [$entity->getRealName()]));
 							}else{
 								$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.notExist"));
@@ -293,12 +335,13 @@ class NPCPlugin extends PluginBase{
 	 * @return EntityBase|null
 	 */
 	public function getEntityById(int $id) : ?EntityBase{
-		foreach(array_values($this->entities) as $entityBase){
-			if($entityBase->getId() === $id){
-				return $entityBase;
-			}
+		if(isset($this->entities[$id])){
+			return $this->entities[$id];
+		}elseif(isset($this->pluginEntities[$id])){
+			return $this->pluginEntities[$id];
+		}else{
+			return null;
 		}
-		return null;
 	}
 
 	/**
@@ -319,20 +362,20 @@ class NPCPlugin extends PluginBase{
 	 * @param EntityBase $entityBase
 	 */
 	public function addEntity(EntityBase $entityBase){
-		$this->entities[self::pos2hash($entityBase->getLocation())] = $entityBase;
+		$this->pluginEntities[$entityBase->getId()] = $entityBase;
 	}
 
 	/**
 	 * @param EntityBase $entityBase
 	 */
 	public function removeEntity(EntityBase $entityBase){
-		unset($this->entities[self::pos2hash($entityBase->getLocation())]);
+		unset($this->entities[$entityBase->getId()]);
 	}
 
 	/**
 	 * @return EntityBase[]
 	 */
 	public function getEntities() : array{
-		return array_values($this->entities);
+		return array_merge(array_values($this->entities), array_values($this->pluginEntities));
 	}
 }
