@@ -7,4 +7,6 @@ final class Queue{
 	public static $removeQueue = [];
 
 	public static $editQueue = [];
+
+	public static $itemQueue = [];
 }

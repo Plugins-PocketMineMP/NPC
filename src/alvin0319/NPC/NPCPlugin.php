@@ -25,6 +25,8 @@ class NPCPlugin extends PluginBase{
 
 	private static $instance = null;
 
+	public const CONFIG_VERSION = "1.0.0";
+
 	protected $data;
 
 	/** @var PluginLang */
@@ -51,13 +53,20 @@ class NPCPlugin extends PluginBase{
 	}
 
 	public function onEnable(){
-		$this->saveResource("config.yml");
 		if(!file_exists($this->getDataFolder() . "images/") or !is_dir($this->getDataFolder() . "images/")){
 			mkdir($this->getDataFolder() . "images/");
 		}
 
 		$this->lang = new PluginLang($this);
 
+		$this->saveResource("config.yml");
+
+		if(version_compare(self::CONFIG_VERSION, $this->getConfig()->getNested("config.version", self::CONFIG_VERSION)) > 0){
+			$this->getLogger()->debug("Found old config data, replacing...");
+			unlink($this->getDataFolder() . "config.yml");
+			$this->saveResource("config.yml");
+			$this->lang->saveNewLang();;
+		}
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
 
@@ -262,13 +271,17 @@ class NPCPlugin extends PluginBase{
 					$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.edit.usage"));
 				}
 				break;
-			case "message":
+			case "item":
+				$item = $sender->getInventory()->getItemInHand();
+				Queue::$itemQueue[$sender->getName()] = $item;
+				$sender->sendMessage(PluginLang::$prefix . "Please attack the entity that you want to set item.");
 				break;
 			default:
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.create.usage"));
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.delete.usage"));
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.edit.usage"));
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.get.usage"));
+				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.item.usage"));
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.entity.list") . implode(", ", array_keys(EntityConfig::NETWORK_IDS)) . ", npc");
 		}
 		return true;

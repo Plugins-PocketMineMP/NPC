@@ -13,6 +13,7 @@ command.create.usage: "/npc create [type] [name] [skinPath(optional)] [geometryP
 command.delete.usage: "/npc remove [id] - Delete entity"
 command.edit.usage: "/npc edit [command|message|scale] [text...] - Edit entity"
 command.get.usage: "/npc get - Get entities"
+command.item.usage: "/npc item - Set item to NPC"
 command.onlyAccept: "{%0} is only accept {%1}"
 command.entity.list: "Entity list: "
 command.list.empty: "The list is empty"

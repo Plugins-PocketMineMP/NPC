@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace alvin0319\NPC;
 
 use alvin0319\NPC\entity\EntityBase;
+use alvin0319\NPC\entity\NPCHuman;
 use alvin0319\NPC\lang\PluginLang;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -45,11 +46,26 @@ class EventListener implements Listener{
 							if(is_numeric(Queue::$editQueue[$player->getName()] ["target"])){
 								$entity->setScale((float) Queue::$editQueue[$player->getName()] ["target"]);
 							}else{
-								$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("command.onlyAccept", ["scale", "int"]));
+								$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("command.onlyAccept", ["scale", "float"]));
 							}
 						}
 						$player->sendMessage(PluginLang::$prefix . "Edit success.");
 						unset(Queue::$editQueue[$player->getName()]);
+					}else{
+						$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("message.notExtend"));
+					}
+					return;
+				}
+
+				if(isset(Queue::$itemQueue[$player->getName()])){
+					if($entity instanceof EntityBase){
+						if($entity instanceof NPCHuman){
+							$entity->setItem(Queue::$itemQueue[$player->getName()]);
+							unset(Queue::$itemQueue[$player->getName()]);
+							$player->sendMessage(PluginLang::$prefix . "Succeed to set item.");
+						}else{
+							$player->sendMessage(PluginLang::$prefix . "That entity is not NPCHuman");
+						}
 					}else{
 						$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("message.notExtend"));
 					}

@@ -40,6 +40,11 @@ class PluginLang{
 		self::$prefix = $this->data["plugin.prefix"];
 	}
 
+	public function saveNewLang(){
+		unlink($this->plugin->getDataFolder() . $this->lang . ".yml");
+		$this->plugin->saveResource($this->lang . ".yml");
+	}
+
 	/**
 	 * @param string $str
 	 * @param array $params

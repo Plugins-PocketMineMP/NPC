@@ -5,6 +5,7 @@ namespace alvin0319\NPC\entity;
 use alvin0319\NPC\NPCPlugin;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Skin;
+use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\level\Location;
 use pocketmine\math\Vector3;
@@ -36,6 +37,9 @@ class NPCHuman extends EntityBase{
 	/** @var Skin */
 	protected $skin;
 
+	/** @var Item */
+	protected $item;
+
 	public function initEntity(CompoundTag $nbt) : void{
 		parent::initEntity($nbt);
 		$this->uuid = UUID::fromRandom();
@@ -62,6 +66,12 @@ class NPCHuman extends EntityBase{
 		}
 
 		$this->scale = $nbt->getFloat("scale", 1.0);
+
+		if($nbt->hasTag("item", CompoundTag::class)){
+			$this->item = Item::nbtDeserialize($nbt->getCompoundTag("item"));
+		}else{
+			$this->item = ItemFactory::get(0);
+		}
 	}
 
 	public function getName() : string{
@@ -86,7 +96,7 @@ class NPCHuman extends EntityBase{
 		$pk->motion = null;
 		$pk->yaw = $this->location->yaw;
 		$pk->pitch = $this->location->pitch;
-		$pk->item = ItemFactory::get(0);
+		$pk->item = $this->item;
 		$pk->metadata = $this->getSyncedNetworkData(false);
 		$player->sendDataPacket($pk);
 
@@ -154,5 +164,17 @@ class NPCHuman extends EntityBase{
 		foreach($this->getViewers() as $player){
 			$player->sendDataPacket($pk);
 		}
+	}
+
+	public function getItem() : Item{
+		return $this->item;
+	}
+
+	public function setItem(?Item $item){
+		if($item === null){
+			$item = ItemFactory::get(0);
+		}
+
+		$this->item = $item;
 	}
 }

@@ -13,6 +13,7 @@ command.create.usage: "/npc create [타입] [이름] [스킨 경로(필요시)] 
 command.delete.usage: "/npc remove [아이디] - 엔티티를 제거합니다."
 command.edit.usage: "/npc edit [command|message|scale] [text...] - 엔티티를 수정합니다."
 command.get.usage: "/npc get - 엔티티 목록을 불러옵니다."
+command.item.usage: "/npc item - 엔피시의 아이템을 설정합니다."
 command.onlyAccept: "{%0}은(는) {%1}만 허용합니다."
 command.entity.list: "사용 가능한 엔티티: "
 command.list.empty: "등록된 엔티티가 없습니다."

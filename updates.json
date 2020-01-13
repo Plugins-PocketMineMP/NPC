@@ -1,5 +1,5 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "updates": {
     "1.0.0": {
       "message": "First release",
@@ -16,6 +16,10 @@
     "1.0.4": {
       "message": "Fixed an error message when not in remove mode, and added plugin dependencies.",
       "mustUpdate": true
+    },
+    "1.0.5": {
+      "message": "Add item",
+      "mustUpdate": false
     }
   }
 }
