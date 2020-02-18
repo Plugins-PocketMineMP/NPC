@@ -29,4 +29,4 @@ If you want to apply modeling, you need to put geometryName: "your geometry name
 
 ![](https://raw.githubusercontent.com/alvin0319/NPC/stable/images/model.png)
 
-![Custom Modeling usage](https://raw.githubusercontent.com/alvin0319/NPC/stable/Custom_Modeling_usage.md)
+![Custom Modeling usage](https://github.com/alvin0319/NPC/stable/Custom_Modeling_usage.md)
