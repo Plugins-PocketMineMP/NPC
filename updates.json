@@ -20,6 +20,10 @@
     "1.0.5": {
       "message": "Add item",
       "mustUpdate": false
+    },
+    "1.0.6": {
+      "message": "Fix some bugs",
+      "mustUpdate": false
     }
   }
 }

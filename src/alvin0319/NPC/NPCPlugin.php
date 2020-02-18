@@ -14,6 +14,7 @@ use alvin0319\NPC\util\FileNotFoundException;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Skin;
+use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\nbt\LittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
@@ -91,6 +92,11 @@ class NPCPlugin extends PluginBase{
 						break;
 					default:
 						throw new \InvalidStateException("Unknown entity type " . $tag->getInt("type"));
+				}
+
+				if(!$class->getLocation()->getLevel() instanceof Level){
+					$this->getLogger()->debug("Skip registering " . $class->getRealName() . " due to not level loaded.");
+					continue;
 				}
 
 				$this->entities[$class->getId()] = $class;

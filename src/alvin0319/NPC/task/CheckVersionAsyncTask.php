@@ -45,8 +45,8 @@ class CheckVersionAsyncTask extends AsyncTask{
 				$lastVer = $this->getResult()["version"];
 
 				if(version_compare($lastVer, $ver) > 0){
-					$mustUpdate = $this->getResult()["update"];
-					$message = $this->getResult()["message"];
+					$mustUpdate = $this->getResult()["update"] ?? false;
+					$message = $this->getResult()["message"] ?? "";
 
 					$plugin->getLogger()->notice("The New version of NPC was released. Now version: " . $ver . ", Last version: " . $lastVer);
 					$plugin->getLogger()->info("Update message: " . $message);
