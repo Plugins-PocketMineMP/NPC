@@ -72,7 +72,7 @@ class EventListener implements Listener{
 					return;
 				}
 
-				if($entity instanceof EntityBase){
+				if($entity instanceof EntityBase || $entity instanceof NPCHuman){
 					$entity->interact($player);
 				}
 			}

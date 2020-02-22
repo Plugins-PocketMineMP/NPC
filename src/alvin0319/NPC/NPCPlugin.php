@@ -113,7 +113,10 @@ class NPCPlugin extends PluginBase{
 
 		foreach($data->getListTag("npc")->getValue() as $tag){
 			if($tag instanceof CompoundTag){
-				$this->tagData[$tag->getString("pluginName", "none")] = $tag;
+				if(!isset($this->tagData[$tag->getString("pluginName", "none")])){
+					$this->tagData[$tag->getString("pluginName", "none")] = [];
+				}
+				$this->tagData[$tag->getString("pluginName", "none")] [] = $tag;
 			}
 		}
 
@@ -139,8 +142,10 @@ class NPCPlugin extends PluginBase{
 		$nbt = new CompoundTag();
 		$tag = new ListTag("npc");
 
-		foreach(array_values($this->pluginEntities) as $baseEntity){
-			$tag->push($baseEntity->nbtSerialize());
+		foreach(array_values($this->pluginEntities) as $entities){
+			foreach($entities as $entity){
+				$tag->push($entity->nbtSerialize());
+			}
 		}
 		$nbt->setTag($tag);
 		file_put_contents($this->getDataFolder() . "plugin_npc.dat", (new LittleEndianNBTStream())->writeCompressed($nbt));
@@ -152,12 +157,14 @@ class NPCPlugin extends PluginBase{
 	 * @param NPCHuman|EntityBase|string $class
 	 */
 	public function registerClass(string $class){
-		foreach($this->tagData as $eclass => $tag){
+		foreach($this->tagData as $eclass => $tags){
 			if($eclass === $class){
-				/** @var EntityBase $npc */
-				$npc = $class::nbtDeserialize($tag);
-				$this->pluginEntities[$npc->getId()] = $npc;
-				unset($this->tagData[$class]);
+				foreach($tags as $tag){
+					/** @var EntityBase $npc */
+					$npc = $class::nbtDeserialize($tag);
+					$this->pluginEntities[$npc->getId()] = $npc;
+					unset($this->tagData[$class]);
+				}
 			}
 		}
 	}
