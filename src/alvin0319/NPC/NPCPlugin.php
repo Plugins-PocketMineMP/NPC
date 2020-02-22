@@ -149,7 +149,7 @@ class NPCPlugin extends PluginBase{
 	}
 
 	/**
-	 * @param string|EntityBase $class
+	 * @param NPCHuman|EntityBase|string $class
 	 */
 	public function registerClass(string $class){
 		foreach($this->tagData as $eclass => $tag){
