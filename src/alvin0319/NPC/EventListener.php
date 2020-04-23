@@ -72,6 +72,16 @@ class EventListener implements Listener{
 					return;
 				}
 
+				if(isset(Queue::$offItemQueue[$player->getName()])){
+					if($entity instanceof NPCHuman){
+						$entity->setItem(Queue::$offItemQueue[$player->getName()], true);
+						unset(Queue::$offItemQueue[$player->getName()]);
+						$player->sendMessage(PluginLang::$prefix . "Succeed to set offhand item.");
+					}else{
+						$player->sendMessage(PluginLang::$prefix . "That entity is not NPCHuman");
+					}
+				}
+
 				if($entity instanceof EntityBase || $entity instanceof NPCHuman){
 					$entity->interact($player);
 				}

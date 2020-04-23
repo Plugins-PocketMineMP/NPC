@@ -7,4 +7,9 @@ api: 3.0.0
 commands:
   npc:
     description: NPC command.
-    permission: op
+    permission: npc.command
+
+permissions:
+  npc.command:
+    default: op
+    description: Allow to control command npc.

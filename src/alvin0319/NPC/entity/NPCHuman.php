@@ -13,8 +13,10 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\AddPlayerPacket;
+use pocketmine\network\mcpe\protocol\MobEquipmentPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
+use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\types\SkinAdapterSingleton;
 use pocketmine\Player;
@@ -39,6 +41,9 @@ class NPCHuman extends EntityBase{
 
 	/** @var Item */
 	protected $item;
+
+	/** @var Item */
+	protected $offHandItem;
 
 	public function initEntity(CompoundTag $nbt) : void{
 		parent::initEntity($nbt);
@@ -71,6 +76,11 @@ class NPCHuman extends EntityBase{
 			$this->item = Item::nbtDeserialize($nbt->getCompoundTag("item"));
 		}else{
 			$this->item = ItemFactory::get(0);
+		}
+		if($nbt->hasTag("offHand", CompoundTag::class)){
+			$this->offHandItem = Item::nbtDeserialize($nbt->getCompoundTag("offHand"));
+		}else{
+			$this->offHandItem = ItemFactory::get(0);
 		}
 	}
 
@@ -108,6 +118,15 @@ class NPCHuman extends EntityBase{
 		$player->sendDataPacket($pk);
 
 		$this->hasSpawned[] = $player;
+
+		if($this->offHandItem->getId() !== 0){
+			$pk = new MobEquipmentPacket();
+			$pk->windowId = ContainerIds::OFFHAND;
+			$pk->entityRuntimeId = $this->getId();
+			$pk->inventorySlot = $pk->hotbarSlot = 0;
+			$pk->item = $this->offHandItem;
+			$this->server->broadcastPacket($this->hasSpawned, $pk);
+		}
 	}
 
 	public function despawnTo(Player $player) : void{
@@ -135,6 +154,8 @@ class NPCHuman extends EntityBase{
 
 		$nbt->setTag(NPCPlugin::getInstance()->getSkinCompound($this->skin));
 		$nbt->setByte("isCustomSkin", $this->isCustomSkin ? 1 : 0);
+		$nbt->setTag($this->item->nbtSerialize(-1, "item"));
+		$nbt->setTag($this->offHandItem->nbtSerialize(-1, "offHand"));
 		return $nbt;
 	}
 
@@ -170,11 +191,14 @@ class NPCHuman extends EntityBase{
 		return $this->item;
 	}
 
-	public function setItem(?Item $item){
+	public function setItem(?Item $item, bool $offHand = false){
 		if($item === null){
 			$item = ItemFactory::get(0);
 		}
 
-		$this->item = $item;
+		if($offHand)
+			$this->offHandItem = $item;
+		else
+			$this->item = $item;
 	}
 }

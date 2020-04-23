@@ -62,11 +62,11 @@ class NPCPlugin extends PluginBase{
 
 		$this->saveResource("config.yml");
 
-		if(version_compare(self::CONFIG_VERSION, $this->getConfig()->getNested("config.version", self::CONFIG_VERSION)) > 0){
+		if(version_compare(self::CONFIG_VERSION, $this->getConfig()->getNested("config-version", self::CONFIG_VERSION)) > 0){
 			$this->getLogger()->debug("Found old config data, replacing...");
 			unlink($this->getDataFolder() . "config.yml");
 			$this->saveResource("config.yml");
-			$this->lang->saveNewLang();;
+			$this->lang->saveNewLang();
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
@@ -123,8 +123,6 @@ class NPCPlugin extends PluginBase{
 		$this->getServer()->getAsyncPool()->submitTask(new CheckVersionAsyncTask());
 
 		$this->imageConfig = new ImageConfig($this);
-
-		$this->getLogger()->info($this->lang->translateLanguage("plugin.loaded"));
 	}
 
 	public function onDisable(){
@@ -149,8 +147,6 @@ class NPCPlugin extends PluginBase{
 		}
 		$nbt->setTag($tag);
 		file_put_contents($this->getDataFolder() . "plugin_npc.dat", (new LittleEndianNBTStream())->writeCompressed($nbt));
-
-		$this->getLogger()->info($this->lang->translateLanguage("plugin.disabled"));
 	}
 
 	/**
@@ -288,6 +284,11 @@ class NPCPlugin extends PluginBase{
 				$item = $sender->getInventory()->getItemInHand();
 				Queue::$itemQueue[$sender->getName()] = $item;
 				$sender->sendMessage(PluginLang::$prefix . "Please attack the entity that you want to set item.");
+				break;
+			case "offhand":
+				$item = $sender->getInventory()->getItemInHand();
+				Queue::$offItemQueue[$sender->getName()] = $item;
+				$sender->sendMessage(PluginLang::$prefix . "Please attack the entity that you want to set offhand item.");
 				break;
 			default:
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.create.usage"));
