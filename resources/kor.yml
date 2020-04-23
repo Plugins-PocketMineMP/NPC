@@ -1,6 +1,4 @@
 plugin.prefix: "§b§l[NPC] §r§7"
-plugin.loaded: "플러그인이 활성화 되었습니다."
-plugin.disabled: "플러그인이 비활성화 되었습니다."
 ext-gd.missing: "현재 실행중인 PHP 바이너리에 gd 라이브러리가 설치되어 있지 않습니다."
 path.notExist: "{%0} 파일이 존재하지 않습니다."
 entity.spawn: "{%0} 엔티티가 생성되었습니다."

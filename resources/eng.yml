@@ -1,6 +1,4 @@
 plugin.prefix: "§b§l[NPC] §r§7"
-plugin.loaded: "is enabled"
-plugin.disabled: "is disabled"
 ext-gd.missing: "The gd-extension is not installed"
 path.notExist: "The file {%0} is not exist"
 entity.spawn: "{%0} entity created"

@@ -1,10 +1,15 @@
 name: NPC
 author: alvin0319
 main: alvin0319\NPC\NPCPlugin
-version: 1.0.7
+version: 1.0.8
 api: 3.0.0
 
 commands:
   npc:
     description: NPC command.
-    permission: op
+    permission: npc.command
+
+permissions:
+  npc.command:
+    default: op
+    description: Allow to control command npc.
