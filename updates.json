@@ -1,5 +1,5 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.8",
   "updates": {
     "1.0.0": {
       "message": "First release",
@@ -27,6 +27,10 @@
     },
     "1.0.7": {
       "message": "Fix for plugin",
+      "mustUpdate": false
+    },
+    "1.0.8": {
+      "message": "Off hand, and fix some bugs",
       "mustUpdate": false
     }
   }
