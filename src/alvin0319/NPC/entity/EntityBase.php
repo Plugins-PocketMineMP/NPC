@@ -234,7 +234,7 @@ abstract class EntityBase{
 		}
 		$pk = new AddActorPacket();
 		$pk->entityRuntimeId = $this->getId();
-		$pk->type = static::NETWORK_ID;
+		$pk->type = AddActorPacket::LEGACY_ID_MAP_BC[static::NETWORK_ID];
 		$pk->position = $this->location->asVector3();
 		$pk->motion = null;
 		$pk->yaw = $this->location->yaw;

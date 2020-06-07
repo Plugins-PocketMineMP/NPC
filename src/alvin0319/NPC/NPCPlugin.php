@@ -11,6 +11,7 @@ use alvin0319\NPC\lang\PluginLang;
 use alvin0319\NPC\task\CheckVersionAsyncTask;
 use alvin0319\NPC\util\ExtensionNotLoadedException;
 use alvin0319\NPC\util\FileNotFoundException;
+use alvin0319\NPC\util\Promise;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Skin;
@@ -120,7 +121,31 @@ class NPCPlugin extends PluginBase{
 			}
 		}
 
-		$this->getServer()->getAsyncPool()->submitTask(new CheckVersionAsyncTask());
+		$promise = new Promise();
+
+		$this->getServer()->getAsyncPool()->submitTask(new CheckVersionAsyncTask($promise));
+
+		$promise->then(function(array $result){
+			$ver = $this->getDescription()->getVersion();
+
+			$lastVer = $result["version"];
+
+			if(version_compare($lastVer, $ver) > 0){
+				$mustUpdate = $result["update"] ?? false;$message = $result["message"] ?? "";
+
+				$this->getLogger()->notice("The New version of NPC was released. Now version: " . $ver . ", Last version: " . $lastVer);
+				$this->getLogger()->info("Update message: " . $message);
+
+				if($mustUpdate){
+					$this->getLogger()->emergency("You must update this plugin before you can use it.");
+					$this->getServer()->getPluginManager()->disablePlugin($this);
+				}
+			}else{
+				$this->getLogger()->info("The latest version.");
+			}
+		})->catch(function(string $err){
+			$this->getLogger()->critical($err);
+		});
 
 		$this->imageConfig = new ImageConfig($this);
 	}

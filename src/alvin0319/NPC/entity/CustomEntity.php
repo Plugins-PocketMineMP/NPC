@@ -53,7 +53,7 @@ class CustomEntity extends EntityBase{
 		}
 		$pk = new AddActorPacket();
 		$pk->entityRuntimeId = $this->getId();
-		$pk->type = $this->id;
+		$pk->type = AddActorPacket::LEGACY_ID_MAP_BC[$this->id];
 		$pk->position = $this->location->asVector3();
 		$pk->motion = null;
 		$pk->yaw = $this->location->yaw;

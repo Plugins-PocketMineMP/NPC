@@ -32,6 +32,10 @@
     "1.0.8": {
       "message": "Off hand, and fix some bugs",
       "mustUpdate": false
+    },
+    "1.0.9": {
+      "message": "Update with latest PMMP changes",
+      "mustUpdate": false
     }
   }
 }
