@@ -56,7 +56,7 @@ class Promise{
 		return $this;
 	}
 
-	public function setNow(string $now, string $value) : Promise{
+	public function setNow(string $now, $value) : Promise{
 		$this->now = $now;
 		$this->value = $value;
 
