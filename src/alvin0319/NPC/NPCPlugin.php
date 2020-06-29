@@ -22,6 +22,31 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_values;
+use function chr;
+use function count;
+use function extension_loaded;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function imagecolorat;
+use function imagecreatefrompng;
+use function imagedestroy;
+use function imagesx;
+use function imagesy;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_dir;
+use function json_decode;
+use function json_encode;
+use function mkdir;
+use function time;
+use function unlink;
+use function version_compare;
 
 class NPCPlugin extends PluginBase{
 
@@ -131,7 +156,8 @@ class NPCPlugin extends PluginBase{
 			$lastVer = $result["version"];
 
 			if(version_compare($lastVer, $ver) > 0){
-				$mustUpdate = $result["update"] ?? false;$message = $result["message"] ?? "";
+				$mustUpdate = $result["update"] ?? false;
+				$message = $result["message"] ?? "";
 
 				$this->getLogger()->notice("The New version of NPC was released. Now version: " . $ver . ", Last version: " . $lastVer);
 				$this->getLogger()->info("Update message: " . $message);
@@ -206,12 +232,11 @@ class NPCPlugin extends PluginBase{
 									if(file_exists($this->getDataFolder() . "images/" . $args[4])){
 										$data = json_decode(file_get_contents($this->getDataFolder() . "images/" . $args[4]), true);
 
-										if(!isset($data["geometryName"])){
+										if(!is_array($geometryName = $this->findGeometryName($data))){
 											$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.geometry"));
 											break;
 										}
 
-										$geometryName = $data["geometryName"];
 										$geometryData = json_encode($data);
 									}else{
 										$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("path.notExist", [$args[4]]));
@@ -283,8 +308,8 @@ class NPCPlugin extends PluginBase{
 				}
 
 				$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("command.list") . implode(", ", array_map(function(EntityBase $entityBase) : string{
-					return "#" . $entityBase->getId() . " " . $entityBase->getRealName() . ": " . self::pos2hash($entityBase->getLocation());
-				}, array_values($this->entities))));
+						return "#" . $entityBase->getId() . " " . $entityBase->getRealName() . ": " . self::pos2hash($entityBase->getLocation());
+					}, array_values($this->entities))));
 				break;
 			case "edit":
 				if(isset($args[1])){
@@ -358,6 +383,15 @@ class NPCPlugin extends PluginBase{
 		}
 		@imagedestroy($img);
 		return new Skin($player->getSkin()->getSkinId(), $bytes, "", $geometryName, $geometryData);
+	}
+
+	private function findGeometryName(array $decodedJsonData) : ?string{
+		if(isset($decodedJsonData["geometryName"])){
+			return $decodedJsonData["geometryName"];
+		}
+		if(isset($decodedJsonData["minecraft:geometry"][0]["description"]["identifier"]))
+			return $decodedJsonData["minecraft:geometry"][0]["description"]["identifier"];
+		return null;
 	}
 
 	/**

@@ -4,6 +4,11 @@ namespace alvin0319\NPC\lang;
 
 use alvin0319\NPC\NPCPlugin;
 use alvin0319\NPC\util\InvalidLanguageException;
+use function file_get_contents;
+use function is_array;
+use function str_replace;
+use function unlink;
+use function yaml_parse;
 
 class PluginLang{
 

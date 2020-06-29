@@ -10,6 +10,8 @@ use pocketmine\nbt\tag\FloatTag;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 use pocketmine\Server;
+use function explode;
+use function in_array;
 
 class CustomEntity extends EntityBase{
 

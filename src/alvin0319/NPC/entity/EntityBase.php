@@ -15,6 +15,14 @@ use pocketmine\network\mcpe\protocol\RemoveActorPacket;
 use pocketmine\network\mcpe\protocol\SetActorDataPacket;
 use pocketmine\Player;
 use pocketmine\Server;
+use function array_search;
+use function atan2;
+use function implode;
+use function in_array;
+use function is_array;
+use function sqrt;
+use function trim;
+use const M_PI;
 
 abstract class EntityBase{
 
