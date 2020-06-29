@@ -39,8 +39,8 @@ use function imagesx;
 use function imagesy;
 use function implode;
 use function in_array;
-use function is_array;
 use function is_dir;
+use function is_string;
 use function json_decode;
 use function json_encode;
 use function mkdir;
@@ -232,7 +232,7 @@ class NPCPlugin extends PluginBase{
 									if(file_exists($this->getDataFolder() . "images/" . $args[4])){
 										$data = json_decode(file_get_contents($this->getDataFolder() . "images/" . $args[4]), true);
 
-										if(!is_array($geometryName = $this->findGeometryName($data))){
+										if(!is_string($geometryName = $this->findGeometryName($data))){
 											$sender->sendMessage(PluginLang::$prefix . $this->lang->translateLanguage("entity.geometry"));
 											break;
 										}
