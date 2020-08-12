@@ -4,6 +4,8 @@ main: alvin0319\NPC\NPCPlugin
 version: 1.0.9
 api: 3.0.0
 
+mcpe-protocol: 408
+
 commands:
   npc:
     description: NPC command.
