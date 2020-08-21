@@ -104,6 +104,9 @@ class EventListener implements Listener{
 
 	public function handleMove(PlayerMoveEvent $event){
 		$player = $event->getPlayer();
+		if(NPCPlugin::getInstance()->getConfig()->getNested("disable-see-player", false)){
+			return;
+		}
 		foreach(NPCPlugin::getInstance()->getEntities() as $entityBase){
 			if($entityBase->getLocation()->getLevel()->getFolderName() === $player->getLevel()->getFolderName()){
 				if($entityBase->getLocation()->distance($player->getLocation()) <= (int) NPCPlugin::getInstance()->getConfig()->getNested("spawn-radius", 10)){
