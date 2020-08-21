@@ -1,11 +1,13 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC\task;
 
 use alvin0319\NPC\util\Promise;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\Internet;
+
 use function is_bool;
 use function json_decode;
 

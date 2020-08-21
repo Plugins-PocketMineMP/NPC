@@ -1,6 +1,6 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/alvin0319/NPC
 branches:
-- stable
+  - stable
 projects:
   NPC:
     path: ""

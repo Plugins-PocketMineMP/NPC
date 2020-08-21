@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC;
 
 use alvin0319\NPC\entity\EntityBase;
@@ -10,6 +11,7 @@ use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
+
 use function is_numeric;
 
 class EventListener implements Listener{
@@ -20,7 +22,7 @@ class EventListener implements Listener{
 
 		if($packet instanceof InventoryTransactionPacket){
 			if($packet->transactionType === InventoryTransactionPacket::TYPE_USE_ITEM_ON_ENTITY){
-				$entity = NPCPlugin::getInstance()->getEntityById($packet->trData->entityRuntimeId);
+				$entity = NPCPlugin::getInstance()->getEntity($packet->trData->entityRuntimeId);
 
 				if(isset(Queue::$removeQueue[$player->getName()])){
 					if($entity instanceof EntityBase){
@@ -47,7 +49,10 @@ class EventListener implements Listener{
 							if(is_numeric(Queue::$editQueue[$player->getName()] ["target"])){
 								$entity->setScale((float) Queue::$editQueue[$player->getName()] ["target"]);
 							}else{
-								$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("command.onlyAccept", ["scale", "float"]));
+								$player->sendMessage(PluginLang::$prefix . NPCPlugin::getInstance()->getLanguage()->translateLanguage("command.onlyAccept", [
+										"scale",
+										"float"
+									]));
 							}
 						}
 						$player->sendMessage(PluginLang::$prefix . "Edit success.");

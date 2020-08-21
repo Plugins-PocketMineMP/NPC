@@ -1,11 +1,18 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC\config;
 
 use alvin0319\NPC\NPCPlugin;
 use alvin0319\NPC\util\Image;
 use pocketmine\utils\Config;
 
+/**
+ * Class ImageConfig
+ *
+ * @package alvin0319\NPC\config
+ * @deprecated
+ */
 class ImageConfig{
 
 	/** @var Image[] */
@@ -26,6 +33,7 @@ class ImageConfig{
 
 	/**
 	 * @param string $key
+	 *
 	 * @return Image|null
 	 */
 	public function getImageData(string $key) : ?Image{
@@ -52,7 +60,11 @@ class ImageConfig{
 		$arr = [];
 
 		foreach($this->images as $name => $image){
-			$arr[$name] = ["skinBytes" => $image->getSkinBytes(), "geometryName" => $image->getGeometryName(), "geometryData" => $image->getGeometryData()];
+			$arr[$name] = [
+				"skinBytes" => $image->getSkinBytes(),
+				"geometryName" => $image->getGeometryName(),
+				"geometryData" => $image->getGeometryData()
+			];
 		}
 
 		$config->setAll($arr);

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC\entity;
 
 use alvin0319\NPC\NPCPlugin;
@@ -55,13 +56,7 @@ class NPCHuman extends EntityBase{
 			throw new \InvalidStateException((new \ReflectionClass($this))->getShortName() . " must have a valid skin set");
 		}
 
-		$this->skin = new Skin(
-			$skinTag->getString("Name"),
-			$skinTag->hasTag("Data", StringTag::class) ? $skinTag->getString("Data") : $skinTag->getByteArray("Data"),
-			$skinTag->getByteArray("CapeData", ""),
-			$skinTag->getString("GeometryName", ""),
-			$skinTag->getByteArray("GeometryData", "")
-		);
+		$this->skin = new Skin($skinTag->getString("Name"), $skinTag->hasTag("Data", StringTag::class) ? $skinTag->getString("Data") : $skinTag->getByteArray("Data"), $skinTag->getByteArray("CapeData", ""), $skinTag->getString("GeometryName", ""), $skinTag->getByteArray("GeometryData", ""));
 
 		$this->isCustomSkin = $nbt->getByte("isCustomSkin", 0) === 1 ? true : false;
 
@@ -139,10 +134,7 @@ class NPCHuman extends EntityBase{
 
 	public static function nbtDeserialize(CompoundTag $nbt) : NPCHuman{
 		[$x, $y, $z, $world] = explode(":", $nbt->getString("pos"));
-		return new NPCHuman(
-			new Location((float) $x, (float) $y, (float) $z, 0.0, 0.0, Server::getInstance()->getLevelByName($world)),
-			$nbt
-		);
+		return new NPCHuman(new Location((float) $x, (float) $y, (float) $z, 0.0, 0.0, Server::getInstance()->getLevelByName($world)), $nbt);
 	}
 
 	public function nbtSerialize() : CompoundTag{
@@ -161,6 +153,7 @@ class NPCHuman extends EntityBase{
 
 	/**
 	 * @param Vector3 $target
+	 *
 	 * @see Living::lookAt()
 	 */
 	public function lookAt(Vector3 $target){
@@ -197,8 +190,7 @@ class NPCHuman extends EntityBase{
 		}
 
 		if($offHand)
-			$this->offHandItem = $item;
-		else
+			$this->offHandItem = $item;else
 			$this->item = $item;
 	}
 }

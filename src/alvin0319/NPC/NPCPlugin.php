@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC;
 
 use alvin0319\NPC\config\EntityConfig;
@@ -22,6 +23,7 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+
 use function array_keys;
 use function array_map;
 use function array_merge;
@@ -52,7 +54,7 @@ class NPCPlugin extends PluginBase{
 
 	private static $instance = null;
 
-	public const CONFIG_VERSION = "1.0.0";
+	public const CONFIG_VERSION = "1.0.1";
 
 	protected $data;
 
@@ -62,16 +64,10 @@ class NPCPlugin extends PluginBase{
 	/** @var EntityBase[] */
 	protected $entities = [];
 
-	/** @var EntityBase[] */
-	protected $pluginEntities = [];
-
-	/** @var CompoundTag[] */
-	protected $tagData = [];
-
 	/** @var ImageConfig */
 	protected $imageConfig;
 
-	public function onLoad(){
+	public function onLoad() : void{
 		self::$instance = $this;
 	}
 
@@ -79,7 +75,7 @@ class NPCPlugin extends PluginBase{
 		return self::$instance;
 	}
 
-	public function onEnable(){
+	public function onEnable() : void{
 		if(!file_exists($this->getDataFolder() . "images/") or !is_dir($this->getDataFolder() . "images/")){
 			mkdir($this->getDataFolder() . "images/");
 		}
@@ -129,23 +125,6 @@ class NPCPlugin extends PluginBase{
 			}
 		}
 
-		if(!file_exists($file = $this->getDataFolder() . "plugin_npc.dat")){
-			$nbt = new CompoundTag();
-			$nbt->setTag(new ListTag("npc"));
-			file_put_contents($file, (new LittleEndianNBTStream())->writeCompressed($nbt));
-		}
-
-		$data = (new LittleEndianNBTStream())->readCompressed(file_get_contents($this->getDataFolder() . "plugin_npc.dat"));
-
-		foreach($data->getListTag("npc")->getValue() as $tag){
-			if($tag instanceof CompoundTag){
-				if(!isset($this->tagData[$tag->getString("pluginName", "none")])){
-					$this->tagData[$tag->getString("pluginName", "none")] = [];
-				}
-				$this->tagData[$tag->getString("pluginName", "none")] [] = $tag;
-			}
-		}
-
 		$promise = new Promise();
 
 		$this->getServer()->getAsyncPool()->submitTask(new CheckVersionAsyncTask($promise));
@@ -176,7 +155,7 @@ class NPCPlugin extends PluginBase{
 		$this->imageConfig = new ImageConfig($this);
 	}
 
-	public function onDisable(){
+	public function onDisable() : void{
 		$nbt = new CompoundTag();
 		$tag = new ListTag("npc");
 
@@ -187,33 +166,6 @@ class NPCPlugin extends PluginBase{
 		file_put_contents($this->getDataFolder() . "npc.dat", (new LittleEndianNBTStream())->writeCompressed($nbt));
 
 		$this->imageConfig->save();
-
-		$nbt = new CompoundTag();
-		$tag = new ListTag("npc");
-
-		foreach(array_values($this->pluginEntities) as $entities){
-			foreach($entities as $entity){
-				$tag->push($entity->nbtSerialize());
-			}
-		}
-		$nbt->setTag($tag);
-		file_put_contents($this->getDataFolder() . "plugin_npc.dat", (new LittleEndianNBTStream())->writeCompressed($nbt));
-	}
-
-	/**
-	 * @param NPCHuman|EntityBase|string $class
-	 */
-	public function registerClass(string $class){
-		foreach($this->tagData as $eclass => $tags){
-			if($eclass === $class){
-				foreach($tags as $tag){
-					/** @var EntityBase $npc */
-					$npc = $class::nbtDeserialize($tag);
-					$this->pluginEntities[$npc->getId()] = $npc;
-					unset($this->tagData[$class]);
-				}
-			}
-		}
 	}
 
 	public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
@@ -356,9 +308,12 @@ class NPCPlugin extends PluginBase{
 	 * @param string $path
 	 * @param string $geometryName
 	 * @param string $geometryData
+	 *
 	 * @return Skin
 	 * @throws ExtensionNotLoadedException
 	 * @throws FileNotFoundException
+	 *
+	 * TO-DO: Process this as asynchronous
 	 */
 	private function imageToSkin(Player $player, string $path, string $geometryName = "", string $geometryData = "") : Skin{
 		if(!extension_loaded("gd")){
@@ -396,6 +351,7 @@ class NPCPlugin extends PluginBase{
 
 	/**
 	 * @param Skin $skin
+	 *
 	 * @return CompoundTag
 	 */
 	public function getSkinCompound(Skin $skin) : CompoundTag{
@@ -411,6 +367,7 @@ class NPCPlugin extends PluginBase{
 
 	/**
 	 * @param Location $pos
+	 *
 	 * @return string
 	 */
 	public static function pos2hash(Location $pos) : string{
@@ -418,21 +375,8 @@ class NPCPlugin extends PluginBase{
 	}
 
 	/**
-	 * @param int $id
-	 * @return EntityBase|null
-	 */
-	public function getEntityById(int $id) : ?EntityBase{
-		if(isset($this->entities[$id])){
-			return $this->entities[$id];
-		}elseif(isset($this->pluginEntities[$id])){
-			return $this->pluginEntities[$id];
-		}else{
-			return null;
-		}
-	}
-
-	/**
 	 * @return PluginLang
+	 * @internal
 	 */
 	public function getLanguage() : PluginLang{
 		return $this->lang;
@@ -440,16 +384,10 @@ class NPCPlugin extends PluginBase{
 
 	/**
 	 * @return ImageConfig
+	 * @deprecated
 	 */
 	public function getImageConfig() : ImageConfig{
 		return $this->imageConfig;
-	}
-
-	/**
-	 * @param EntityBase $entityBase
-	 */
-	public function addEntity(EntityBase $entityBase){
-		$this->pluginEntities[$entityBase->getId()] = $entityBase;
 	}
 
 	/**
@@ -463,6 +401,15 @@ class NPCPlugin extends PluginBase{
 	 * @return EntityBase[]
 	 */
 	public function getEntities() : array{
-		return array_merge(array_values($this->entities), array_values($this->pluginEntities));
+		return array_values($this->entities);
+	}
+
+	/**
+	 * @param int $runtimeId
+	 *
+	 * @return EntityBase|null
+	 */
+	public function getEntity(int $runtimeId) : ?EntityBase{
+		return $this->entities[$runtimeId] ?? null;
 	}
 }

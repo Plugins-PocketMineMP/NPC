@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC\entity;
 
 use alvin0319\NPC\config\EntityConfig;
@@ -10,6 +11,7 @@ use pocketmine\nbt\tag\FloatTag;
 use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\Player;
 use pocketmine\Server;
+
 use function explode;
 use function in_array;
 
@@ -18,7 +20,7 @@ class CustomEntity extends EntityBase{
 	public const NETWORK_ID = 0xf;
 
 	/** @var int */
-	protected $id;
+	protected $networkId;
 
 	protected $width;
 
@@ -26,13 +28,14 @@ class CustomEntity extends EntityBase{
 
 	/**
 	 * CustomEntity constructor.
-	 * @param int $networkId
-	 * @param Location $location
+	 *
+	 * @param int         $networkId
+	 * @param Location    $location
 	 * @param CompoundTag $nbt
 	 */
 	public function __construct(int $networkId, Location $location, CompoundTag $nbt){
 		parent::__construct($location, $nbt);
-		$this->id = $networkId;
+		$this->networkId = $networkId;
 
 		$this->width = EntityConfig::WIDTHS[$this->id];
 		$this->height = EntityConfig::HEIGHTS[$this->id];
@@ -46,7 +49,7 @@ class CustomEntity extends EntityBase{
 	}
 
 	public function getNetworkId() : int{
-		return $this->id;
+		return $this->networkId;
 	}
 
 	public function spawnTo(Player $player) : void{
@@ -69,16 +72,12 @@ class CustomEntity extends EntityBase{
 
 	public static function nbtDeserialize(CompoundTag $nbt){
 		[$x, $y, $z, $world] = explode(":", $nbt->getString("pos"));
-		return new CustomEntity(
-			$nbt->getInt("networkId"),
-			new Location((float) $x, (float) $y, (float) $z, 0.0, 0.0, Server::getInstance()->getLevelByName($world)),
-			$nbt
-		);
+		return new CustomEntity($nbt->getInt("networkId"), new Location((float) $x, (float) $y, (float) $z, 0.0, 0.0, Server::getInstance()->getLevelByName($world)), $nbt);
 	}
 
 	public function nbtSerialize() : CompoundTag{
 		$nbt = parent::nbtSerialize();
-		$nbt->setInt("networkId", $this->id);
+		$nbt->setInt("networkId", $this->networkId);
 		$nbt->setInt("type", self::NETWORK_ID);
 		return $nbt;
 	}

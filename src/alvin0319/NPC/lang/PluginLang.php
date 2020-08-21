@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC\lang;
 
 use alvin0319\NPC\NPCPlugin;
 use alvin0319\NPC\util\InvalidLanguageException;
+
 use function file_get_contents;
 use function is_array;
 use function str_replace;
@@ -26,7 +28,9 @@ class PluginLang{
 
 	/**
 	 * PluginLang constructor.
+	 *
 	 * @param NPCPlugin $plugin
+	 *
 	 * @throws InvalidLanguageException
 	 */
 	public function __construct(NPCPlugin $plugin){
@@ -52,7 +56,8 @@ class PluginLang{
 
 	/**
 	 * @param string $str
-	 * @param array $params
+	 * @param array  $params
+	 *
 	 * @return string
 	 */
 	public function translateLanguage(string $str, array $params = []) : string{
@@ -66,6 +71,7 @@ class PluginLang{
 
 	/**
 	 * @param string $str
+	 *
 	 * @return string
 	 */
 	public function getRealMessage(string $str) : string{

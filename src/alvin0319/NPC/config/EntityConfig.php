@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC\config;
 
 /**
  * Class EntityConfig
+ *
  * @package NPC\config
  * Thanks to RevivalPMMP
  * @link https://github.com/RevivalPMMP/PureEntitiesX/blob/master/src/revivalpmmp/pureentities/data/Data.php

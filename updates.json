@@ -1,41 +1,25 @@
 {
-  "version": "1.0.8",
-  "updates": {
-    "1.0.0": {
-      "message": "First release",
-      "mustUpdate": false
-    },
-    "1.0.1": {
-      "message": "stable support",
-      "mustUpdate": false
-    },
-    "1.0.3": {
-      "message": "add scale, and fix some bugs, and rewrite EntityBase code.",
-      "mustUpdate": true
-    },
-    "1.0.4": {
-      "message": "Fixed an error message when not in remove mode, and added plugin dependencies.",
-      "mustUpdate": true
-    },
-    "1.0.5": {
-      "message": "Add item",
-      "mustUpdate": false
-    },
-    "1.0.6": {
-      "message": "Fix some bugs",
-      "mustUpdate": false
-    },
-    "1.0.7": {
-      "message": "Fix for plugin",
-      "mustUpdate": false
-    },
-    "1.0.8": {
-      "message": "Off hand, and fix some bugs",
-      "mustUpdate": false
-    },
-    "1.0.9": {
-      "message": "Update with latest PMMP changes",
-      "mustUpdate": false
-    }
+  "version": "1.0.8", "updates": {
+  "1.0.0": {
+    "message": "First release", "mustUpdate": false
+  }, "1.0.1": {
+    "message": "stable support", "mustUpdate": false
+  }, "1.0.3": {
+    "message": "add scale, and fix some bugs, and rewrite EntityBase code.", "mustUpdate": true
+  }, "1.0.4": {
+    "message": "Fixed an error message when not in remove mode, and added plugin dependencies.", "mustUpdate": true
+  }, "1.0.5": {
+    "message": "Add item", "mustUpdate": false
+  }, "1.0.6": {
+    "message": "Fix some bugs", "mustUpdate": false
+  }, "1.0.7": {
+    "message": "Fix for plugin", "mustUpdate": false
+  }, "1.0.8": {
+    "message": "Off hand, and fix some bugs", "mustUpdate": false
+  }, "1.0.9": {
+    "message": "Update with latest PMMP changes", "mustUpdate": false
+  }, "1.0.10": {
+    "message": "Fix code logic, Update protocol, added disable npc rotation follow option.", "mustUpdate": false
   }
+}
 }

@@ -1,7 +1,7 @@
 name: NPC
 author: alvin0319
 main: alvin0319\NPC\NPCPlugin
-version: 1.0.9
+version: 1.0.10
 api: 3.0.0
 
 mcpe-protocol: 408

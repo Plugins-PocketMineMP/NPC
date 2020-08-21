@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC\entity;
 
 use pocketmine\entity\DataPropertyManager;
@@ -15,6 +16,7 @@ use pocketmine\network\mcpe\protocol\RemoveActorPacket;
 use pocketmine\network\mcpe\protocol\SetActorDataPacket;
 use pocketmine\Player;
 use pocketmine\Server;
+
 use function array_search;
 use function atan2;
 use function implode;
@@ -22,6 +24,7 @@ use function in_array;
 use function is_array;
 use function sqrt;
 use function trim;
+
 use const M_PI;
 
 abstract class EntityBase{
@@ -57,7 +60,8 @@ abstract class EntityBase{
 
 	/**
 	 * EntityBase constructor.
-	 * @param Location $location
+	 *
+	 * @param Location    $location
 	 * @param CompoundTag $nbt
 	 */
 	public function __construct(Location $location, CompoundTag $nbt){
@@ -90,6 +94,7 @@ abstract class EntityBase{
 
 	/**
 	 * @param Vector3 $target
+	 *
 	 * @see Living::lookAt()
 	 */
 	public function lookAt(Vector3 $target){
@@ -166,8 +171,9 @@ abstract class EntityBase{
 	}
 
 	/**
-	 * @param $player
+	 * @param            $player
 	 * @param array|null $data
+	 *
 	 * @see Entity::sendData()
 	 */
 	public function sendData($player, ?array $data = null) : void{
@@ -191,7 +197,7 @@ abstract class EntityBase{
 	 * @see Entity::syncNetworkData()
 	 */
 	protected function syncNetworkData() : void{
-		$this->networkProperties->setByte(Entity::DATA_ALWAYS_SHOW_NAMETAG,1);
+		$this->networkProperties->setByte(Entity::DATA_ALWAYS_SHOW_NAMETAG, 1);
 		$this->networkProperties->setFloat(Entity::DATA_BOUNDING_BOX_HEIGHT, $this->height);
 		$this->networkProperties->setFloat(Entity::DATA_BOUNDING_BOX_WIDTH, $this->width);
 		$this->networkProperties->setFloat(Entity::DATA_SCALE, $this->scale);
@@ -229,7 +235,12 @@ abstract class EntityBase{
 		$nbt->setString("name", $this->name);
 		$nbt->setString("message", $this->message);
 		$nbt->setString("command", $this->command);
-		$nbt->setString("pos", implode(":", [$this->location->x, $this->location->y, $this->location->z, $this->location->level->getFolderName()]));
+		$nbt->setString("pos", implode(":", [
+			$this->location->x,
+			$this->location->y,
+			$this->location->z,
+			$this->location->level->getFolderName()
+		]));
 		$nbt->setFloat("scale", $this->scale);
 		$nbt->setFloat("width", $this->width);
 		$nbt->setFloat("height", $this->height);
@@ -237,21 +248,7 @@ abstract class EntityBase{
 	}
 
 	public function spawnTo(Player $player) : void{
-		if(in_array($player, $this->hasSpawned, true)){
-			return;
-		}
-		$pk = new AddActorPacket();
-		$pk->entityRuntimeId = $this->getId();
-		$pk->type = AddActorPacket::LEGACY_ID_MAP_BC[static::NETWORK_ID];
-		$pk->position = $this->location->asVector3();
-		$pk->motion = null;
-		$pk->yaw = $this->location->yaw;
-		$pk->headYaw = $this->location->yaw;
-		$pk->pitch = $this->location->pitch;
-		$pk->metadata = $this->getSyncedNetworkData(false);
 
-		$player->sendDataPacket($pk);
-		$this->hasSpawned[] = $player;
 	}
 
 	public function despawnTo(Player $player) : void{
