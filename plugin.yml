@@ -1,17 +1,7 @@
 name: NPC
 author: alvin0319
-main: alvin0319\NPC\NPCPlugin
-version: 1.0.10
+main: alvin0319\NPC\NPCLoader
+version: 2.0.0
 api: 3.0.0
 
 mcpe-protocol: 408
-
-commands:
-  npc:
-    description: NPC command.
-    permission: npc.command
-
-permissions:
-  npc.command:
-    default: op
-    description: Allow to control command npc.

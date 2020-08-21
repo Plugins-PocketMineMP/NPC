@@ -1,32 +1,24 @@
 <?php
 declare(strict_types=1);
-
 namespace alvin0319\NPC\util;
 
 use Closure;
 
 class Promise{
-
+	/** @var string */
 	public const PENDING = "pending";
-
+	/** @var string */
 	public const REJECTED = "rejected";
-
+	/** @var string */
 	public const FULFILLED = "fulfilled";
-
 	/** @var mixed */
 	protected $value = null;
-
 	/** @var string */
 	protected $now = self::PENDING;
-
 	/** @var Closure[] */
 	protected $fulfilled = [];
-
 	/** @var Closure[] */
 	protected $rejected = [];
-
-	public function __construct(){
-	}
 
 	public function then(Closure $callback) : Promise{
 		if($this->now === self::FULFILLED){
