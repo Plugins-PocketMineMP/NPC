@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 namespace alvin0319\NPC;
 
 use pocketmine\plugin\PluginBase;
@@ -13,7 +14,6 @@ class NPCLoader extends PluginBase{
 	}
 
 	public function onEnable() : void{
-
 	}
 
 	public function onDisable() : void{
